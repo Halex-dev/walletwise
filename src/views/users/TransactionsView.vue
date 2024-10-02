@@ -247,7 +247,7 @@ async function fetchTransactions() {
 
 function showNewTransactionDialog() {
   editingTransaction.value = {
-    date: new Date().toISOString().split('T')[0],
+    date: new Date(),
     amount: 0,
     is_recurring: false,
   }

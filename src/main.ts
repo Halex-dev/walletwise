@@ -2,7 +2,7 @@ import '@/styles/style.css'
 import 'primeicons/primeicons.css'
 
 import App from './App.vue'
-import { createApp, watchEffect } from 'vue'
+import { createApp } from 'vue'
 
 // Router
 import router from './router'

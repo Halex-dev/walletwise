@@ -1,0 +1,14 @@
+{
+  "common": {
+    "appName": "WalletWise",
+    "darkMode": "Modalità Scura",
+    "lightMode": "Modalità Chiara"
+  },
+  "nav": {
+    "dashboard": "Cruscotto",
+    "expenses": "Spese",
+    "income": "Entrate",
+    "budget": "Budget",
+    "assets": "Patrimonio"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "common": {
+    "appName": "WalletWise",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "loading": "Loading...",
+    "logout": "Logout",
+    "cancel": "Cancel",
+    "save": "Save",
+    "confirm": "Confirm",
+    "actions": "Actions",
+    "confirmDelete": "Confirm Delete",
+    "success": "Success",
+    "error": "Error",
+    "search": "Search"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "categories": "Categories",
+    "settings": "Settings"
+  },
+  "pages": {
+    "auth": {
+      "login": "Login",
+      "signInWithGoogle": "Sign in with Google",
+      "loginFailed": "Login failed. Please try again."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "shortTermInvestments": "Short-term Investments",
+      "longTermInvestments": "Long-term Investments",
+      "budgetAllocation": "Budget Allocation",
+      "necessities": "Necessities",
+      "wants": "Wants",
+      "savings": "Savings",
+      "incomeVsExpenses": "Income vs Expenses",
+      "income": "Income",
+      "expenses": "Expenses",
+      "amount": "Amount",
+      "recentTransactions": "Recent Transactions"
+    },
+    "categories": {
+      "title": "Categories",
+      "addNew": "Add New Category",
+      "name": "Name",
+      "icon": "Icon",
+      "type": "Type",
+      "edit": "Edit Category",
+      "deleteConfirm": "Are you sure you want to delete this category?",
+      "createSuccess": "Category created successfully",
+      "updateSuccess": "Category updated successfully",
+      "deleteSuccess": "Category deleted successfully",
+      "fetchError": "Error fetching categories",
+      "typesError": "Error fetching category types",
+      "saveError": "Error saving category",
+      "deleteError": "Error deleting category"
+    },
+    "settings": {
+      "title": "User Settings",
+      "personalInfo": "Personal Information",
+      "username": "Username",
+      "email": "Email",
+      "preferences": "Preferences",
+      "startDay": "Start Day of Financial Month",
+      "startDayDescription": "This determines which day of the month your financial period begins.",
+      "saveChanges": "Save Changes",
+      "days": {
+        "day": "Day {day}"
+      }
+    },
+    "transactions": {
+      "title": "Transactions",
+      "new": "New Transaction",
+      "edit": "Edit Transaction",
+      "date": "Date",
+      "description": "Description",
+      "category": "Category",
+      "amount": "Amount",
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "balance": "Balance",
+      "isRecurring": "Is Recurring",
+      "recurrenceFrequency": "Recurrence Frequency",
+      "deleteConfirmation": "Are you sure you want to delete this transaction?",
+      "createSuccess": "Transaction created successfully",
+      "updateSuccess": "Transaction updated successfully",
+      "deleteSuccess": "Transaction deleted successfully",
+      "errorOccurred": "An error occurred. Please try again.",
+      "newTransaction": "New Transaction"
+    }
+  }
+}

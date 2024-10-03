@@ -1,26 +1,21 @@
 import { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
-function getRedirectUrl(): string {
-  // In produzione, usa l'URL corrente
-  if (import.meta.env.PROD) {
-    const url = new URL(window.location.href)
-    return `${url.protocol}//${url.host}/auth/callback`
-  }
-  // In sviluppo, usa localhost
-  return `${window.location.origin}/auth/callback`
+const redirectUrl = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+if (!redirectUrl) {
+  throw new Error(
+    "VITE_SUPABASE_ANON_KEY devo essere definito nelle variabili d'ambiente"
+  )
 }
 
 export const authService = {
   async loginWithGoogle(): Promise<{ url: string } | null> {
     try {
-      const redirectTo = getRedirectUrl()
-      console.log('Redirecting to:', redirectTo)
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo,
+          redirectTo: redirectUrl,
         },
       })
       if (error) throw error

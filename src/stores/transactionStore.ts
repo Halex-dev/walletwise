@@ -23,6 +23,22 @@ export const useTransactionStore = defineStore('transaction', () => {
       .reduce((sum, t) => sum + t.amount, 0)
   )
 
+  const totalNecessary = computed(() =>
+    transactions.value
+      .filter((t) =>
+        ['necessary_expense'].includes(t.category?.type?.name || '')
+      )
+      .reduce((sum, t) => sum + t.amount, 0)
+  )
+
+  const totalOptional = computed(() =>
+    transactions.value
+      .filter((t) =>
+        ['optional_expense'].includes(t.category?.type?.name || '')
+      )
+      .reduce((sum, t) => sum + t.amount, 0)
+  )
+
   const totalShortInvestment = computed(() =>
     transactions.value
       .filter((t) =>
@@ -113,6 +129,8 @@ export const useTransactionStore = defineStore('transaction', () => {
     totalExpenses,
     totalShortInvestment,
     totalLongInvestment,
+    totalNecessary,
+    totalOptional,
     fetchRecurrenceFrequencies,
     fetchUserTransactions,
     createTransaction,

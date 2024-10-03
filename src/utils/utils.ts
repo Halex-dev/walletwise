@@ -8,3 +8,7 @@ export function formatCurrency(amount: number): string {
 export function formatDate(date: string): string {
   return new Date(date).toLocaleDateString()
 }
+
+export const roundToTwoDecimals = (value: number) => {
+  return Math.round(value * 100) / 100
+}

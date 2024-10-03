@@ -1,7 +1,7 @@
 import { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
-const redirectUrl = import.meta.env.VITE_SUPABASE_ANON_KEY
+const redirectUrl = import.meta.env.VITE_AUTH_REDIRECT_URL
 
 if (!redirectUrl) {
   throw new Error(

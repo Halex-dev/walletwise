@@ -1,13 +1,21 @@
 import { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
+function getRedirectUrl(): string {
+  // In produzione, usa l'URL corrente
+  if (import.meta.env.PROD) {
+    const url = new URL(window.location.href)
+    return `${url.protocol}//${url.host}/auth/callback`
+  }
+  // In sviluppo, usa localhost
+  return `${window.location.origin}/auth/callback`
+}
+
 export const authService = {
   async loginWithGoogle(): Promise<{ url: string } | null> {
     try {
-      const redirectTo =
-        import.meta.env.MODE === 'production'
-          ? `${import.meta.env.VITE_APP_URL}/auth/callback`
-          : `${window.location.origin}/auth/callback`
+      const redirectTo = getRedirectUrl()
+      console.log('Redirecting to:', redirectTo)
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

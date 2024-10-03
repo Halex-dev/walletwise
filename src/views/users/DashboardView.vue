@@ -318,6 +318,7 @@ const getAmountClass = (transaction: any) => {
 }
 
 const getCategoryIcon = (category: any) => {
+  console.log(category)
   // Implementa la logica per ottenere l'icona della categoria
   return 'pi pi-tag'
 }

@@ -1,6 +1,9 @@
+<!-- DashboardView.vue -->
 <template>
   <div class="p-4 bg-surface text-text">
-    <h1 class="text-3xl font-bold mb-6">{{ $t('pages.dashboard.title') }}</h1>
+    <h1 class="text-3xl font-bold mb-6">
+      {{ $t('pages.dashboard.welcome') }} {{ appUser?.username }}
+    </h1>
 
     <!-- Sommario finanziario -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -53,12 +56,12 @@
             <span>
               {{ formatCurrency(category.spent) }} /
               {{ formatCurrency(category.limit) }} ({{
-                roundToTwoDecimals((category.spent / category.limit) * 100)
-              }}%)
+                formatPercentage(category.spent / category.limit)
+              }})
             </span>
           </div>
           <ProgressBar
-            :value="roundToTwoDecimals((category.spent / category.limit) * 100)"
+            :value="(category.spent / category.limit) * 100"
             :class="category.colorClass"
           />
         </div>
@@ -84,7 +87,7 @@
         </template>
       </Card>
 
-      <!-- Grafico a barre per categorie di spesa -->
+      <!-- Grafico a torta per categorie di spesa -->
       <Card class="shadow-md">
         <template #header>
           <h2 class="text-xl font-semibold">
@@ -93,9 +96,9 @@
         </template>
         <template #content>
           <Chart
-            type="bar"
+            type="pie"
             :data="expensesByCategoryData"
-            :options="barChartOptions"
+            :options="pieChartOptions"
             class="h-64"
           />
         </template>
@@ -162,13 +165,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import Chart from 'primevue/chart'
-import ProgressBar from 'primevue/progressbar'
-import Dropdown from 'primevue/dropdown'
 import { useTransactionStore } from '@/stores/transactionStore'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
-import { formatCurrency, formatDate, roundToTwoDecimals } from '@/utils/utils'
+import { formatCurrency, formatDate, formatPercentage } from '@/utils/utils'
 import { calculateDateRange, formatDateForAPI } from '@/utils/date'
 
 const { t } = useI18n()
@@ -181,8 +181,9 @@ const {
   totalExpenses,
   totalShortInvestment,
   totalLongInvestment,
-  totalOptional,
   totalNecessary,
+  totalOptional,
+  expensesByCategory,
 } = storeToRefs(transactionStore)
 const { appUser } = storeToRefs(authStore)
 
@@ -202,39 +203,39 @@ const financialSummary = computed(() => [
     icon: 'pi pi-shopping-cart',
   },
   {
-    label: 'pages.dashboard.shortTermInvestments',
-    value: totalShortInvestment.value,
+    label: 'pages.dashboard.totalInvestments',
+    value: totalShortInvestment.value + totalLongInvestment.value,
     colorClass: 'text-blue-500',
     icon: 'pi pi-chart-line',
   },
   {
-    label: 'pages.dashboard.longTermInvestments',
-    value: totalLongInvestment.value,
+    label: 'pages.dashboard.totalSavings',
+    value: totalIncome.value - totalExpenses.value,
     colorClass: 'text-purple-500',
-    icon: 'pi pi-chart-bar',
+    icon: 'pi pi-wallet',
   },
 ])
 
-const budgetRules = ref([
+const budgetRules = computed(() => [
   {
     name: '50/30/20 Rule',
     categories: [
       {
         name: 'Necessities',
         limit: totalIncome.value * 0.5,
-        spent: totalNecessary.value * 0.5,
+        spent: totalNecessary.value,
         colorClass: 'bg-blue-500',
       },
       {
         name: 'Wants',
         limit: totalIncome.value * 0.3,
-        spent: totalOptional.value * 0.3,
+        spent: totalOptional.value,
         colorClass: 'bg-green-500',
       },
       {
-        name: 'Savings',
+        name: 'Savings & Investments',
         limit: totalIncome.value * 0.2,
-        spent: totalIncome.value - totalExpenses.value,
+        spent: totalShortInvestment.value + totalLongInvestment.value,
         colorClass: 'bg-yellow-500',
       },
     ],
@@ -249,11 +250,9 @@ const budgetRules = ref([
         colorClass: 'bg-purple-500',
       },
       {
-        name: 'Savings',
+        name: 'Savings & Investments',
         limit: totalIncome.value * 0.2,
-        spent:
-          totalIncome.value * 0.2 -
-          (totalExpenses.value - totalIncome.value * 0.8),
+        spent: totalShortInvestment.value + totalLongInvestment.value,
         colorClass: 'bg-indigo-500',
       },
     ],
@@ -263,17 +262,17 @@ const budgetRules = ref([
 const selectedBudgetRule = ref(budgetRules.value[0])
 
 const incomeVsExpensesData = computed(() => ({
-  labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  labels: transactionStore.monthLabels,
   datasets: [
     {
       label: t('pages.dashboard.income'),
-      data: [1000, 1200, 1100, 1300, 1400, 1500],
+      data: transactionStore.monthlyIncome,
       borderColor: '#4CAF50',
       tension: 0.4,
     },
     {
       label: t('pages.dashboard.expenses'),
-      data: [800, 950, 900, 1100, 1000, 1200],
+      data: transactionStore.monthlyExpenses,
       borderColor: '#F44336',
       tension: 0.4,
     },
@@ -281,12 +280,22 @@ const incomeVsExpensesData = computed(() => ({
 }))
 
 const expensesByCategoryData = computed(() => ({
-  labels: ['Food', 'Transport', 'Entertainment', 'Utilities', 'Other'],
+  labels: expensesByCategory.value.map((category) => category.name),
   datasets: [
     {
-      label: t('pages.dashboard.expenses'),
-      data: [300, 200, 150, 250, 100],
-      backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+      data: expensesByCategory.value.map((category) => category.amount),
+      backgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+        '#9966FF',
+        '#FF9F40',
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+      ],
     },
   ],
 }))
@@ -301,12 +310,12 @@ const lineChartOptions = {
   },
 }
 
-const barChartOptions = {
+const pieChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false,
+      position: 'right',
     },
   },
 }
@@ -318,9 +327,15 @@ const getAmountClass = (transaction: any) => {
 }
 
 const getCategoryIcon = (category: any) => {
-  console.log(category)
   // Implementa la logica per ottenere l'icona della categoria
-  return 'pi pi-tag'
+  const iconMap: { [key: string]: string } = {
+    income: 'pi pi-dollar',
+    necessary_expense: 'pi pi-home',
+    optional_expense: 'pi pi-shopping-cart',
+    short_term_investment: 'pi pi-chart-line',
+    long_term_investment: 'pi pi-chart-bar',
+  }
+  return iconMap[category?.type?.name] || 'pi pi-tag'
 }
 
 async function fetchTransactions() {
@@ -338,5 +353,7 @@ onMounted(async () => {
   if (appUser.value) {
     await fetchTransactions()
   }
+
+  selectedBudgetRule.value = budgetRules.value[0]
 })
 </script>

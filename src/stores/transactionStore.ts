@@ -2,6 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Transaction, RecurrenceFrequency } from '@/types/transaction'
 import { transactionService } from '@/services/supabase/transaction'
+import {
+  startOfMonth,
+  endOfMonth,
+  eachMonthOfInterval,
+  parseISO,
+  format,
+} from 'date-fns'
 
 export const useTransactionStore = defineStore('transaction', () => {
   const transactions = ref<Transaction[]>([])
@@ -55,12 +62,57 @@ export const useTransactionStore = defineStore('transaction', () => {
       .reduce((sum, t) => sum + t.amount, 0)
   )
 
+  const expensesByCategory = computed(() => {
+    const categories: { [key: string]: number } = {}
+    transactions.value
+      .filter((t) =>
+        ['necessary_expense', 'optional_expense'].includes(
+          t.category?.type?.name || ''
+        )
+      )
+      .forEach((t) => {
+        const categoryName = t.category?.name || 'Uncategorized'
+        categories[categoryName] = (categories[categoryName] || 0) + t.amount
+      })
+    return Object.entries(categories)
+      .map(([name, amount]) => ({ name, amount }))
+      .sort((a, b) => b.amount - a.amount)
+  })
+
+  const monthLabels = computed(() => {
+    if (transactions.value.length === 0) return []
+    const dates = transactions.value.map((t) => parseISO(t.date))
+    const minDate = new Date(Math.min.apply(null, dates))
+    const maxDate = new Date(Math.max.apply(null, dates))
+    return eachMonthOfInterval({
+      start: startOfMonth(minDate),
+      end: endOfMonth(maxDate),
+    }).map((date) => format(date, 'MMM yyyy'))
+  })
+
+  const monthlyIncome = computed(() => calculateMonthlyData('income'))
+  const monthlyExpenses = computed(() =>
+    calculateMonthlyData(['necessary_expense', 'optional_expense'])
+  )
+
+  function calculateMonthlyData(types: string | string[]) {
+    const typeArray = Array.isArray(types) ? types : [types]
+    const monthlyData: { [key: string]: number } = {}
+    transactions.value
+      .filter((t) => typeArray.includes(t.category?.type?.name || ''))
+      .forEach((t) => {
+        const month = format(parseISO(t.date), 'MMM yyyy')
+        monthlyData[month] = (monthlyData[month] || 0) + t.amount
+      })
+    return monthLabels.value.map((month) => monthlyData[month] || 0)
+  }
+
   async function fetchRecurrenceFrequencies() {
     try {
       recurrenceFrequencies.value =
         await transactionService.getRecurrenceFrequencies()
     } catch (error) {
-      console.error('Errore nel recupero delle frequenze di ricorrenza:', error)
+      console.error('Error fetching recurrence frequencies:', error)
     }
   }
 
@@ -76,7 +128,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         endDate
       )
     } catch (error) {
-      console.error('Errore nel recupero delle transazioni:', error)
+      console.error('Error fetching user transactions:', error)
     }
   }
 
@@ -86,7 +138,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         await transactionService.createTransaction(transaction)
       transactions.value.unshift(newTransaction)
     } catch (error) {
-      console.error('Errore nella creazione della transazione:', error)
+      console.error('Error creating transaction:', error)
       throw error
     }
   }
@@ -105,7 +157,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         transactions.value[index] = updatedTransaction
       }
     } catch (error) {
-      console.error("Errore nell'aggiornamento della transazione:", error)
+      console.error('Error updating transaction:', error)
       throw error
     }
   }
@@ -117,7 +169,7 @@ export const useTransactionStore = defineStore('transaction', () => {
         (t) => t.id !== transactionId
       )
     } catch (error) {
-      console.error("Errore nell'eliminazione della transazione:", error)
+      console.error('Error deleting transaction:', error)
       throw error
     }
   }
@@ -127,10 +179,14 @@ export const useTransactionStore = defineStore('transaction', () => {
     recurrenceFrequencies,
     totalIncome,
     totalExpenses,
-    totalShortInvestment,
-    totalLongInvestment,
     totalNecessary,
     totalOptional,
+    totalShortInvestment,
+    totalLongInvestment,
+    expensesByCategory,
+    monthLabels,
+    monthlyIncome,
+    monthlyExpenses,
     fetchRecurrenceFrequencies,
     fetchUserTransactions,
     createTransaction,

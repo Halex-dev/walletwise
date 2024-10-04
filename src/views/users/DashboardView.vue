@@ -37,7 +37,7 @@
           <h2 class="text-xl font-semibold">
             {{ $t('pages.dashboard.budgetRules') }}
           </h2>
-          <Dropdown
+          <Select
             v-model="selectedBudgetRule"
             :options="budgetRules"
             optionLabel="name"

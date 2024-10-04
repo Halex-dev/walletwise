@@ -61,7 +61,14 @@
       "fetchError": "Error fetching categories",
       "typesError": "Error fetching category types",
       "saveError": "Error saving category",
-      "deleteError": "Error deleting category"
+      "deleteError": "Error deleting category",
+      "categoryTypes": {
+        "income": "Income",
+        "necessary_expense": "Necessary Expense",
+        "optional_expense": "Optional Expense",
+        "short_term_investment": "Short-term Investment",
+        "long_term_investment": "Long-term Investment"
+      }
     },
     "settings": {
       "title": "User Settings",

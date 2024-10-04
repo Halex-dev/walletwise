@@ -1,8 +1,26 @@
+import type { Transaction } from '@/types/transaction'
+
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
     currency: 'EUR',
   }).format(amount)
+}
+
+export function formatAmount(transaction: Transaction): string {
+  if (!transaction.category?.type) return formatCurrency(transaction.amount)
+  const categoryTypeName = transaction.category.type.name
+
+  if (categoryTypeName === 'income') {
+    return '+ ' + formatCurrency(transaction.amount)
+  } else if (
+    categoryTypeName === 'short_term_investment' ||
+    categoryTypeName === 'long_term_investment'
+  ) {
+    return formatCurrency(transaction.amount)
+  } else {
+    return '- ' + formatCurrency(transaction.amount)
+  }
 }
 
 export function formatDate(date: string): string {

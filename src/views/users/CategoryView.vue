@@ -2,38 +2,56 @@
   <div class="category-page">
     <h1 class="text-2xl font-bold mb-4">{{ $t('pages.categories.title') }}</h1>
 
-    <div class="mb-4">
+    <div class="mb-4 flex justify-between items-center">
       <Button
         @click="openNewCategoryDialog"
         :label="$t('pages.categories.addNew')"
         icon="pi pi-plus"
+        class="p-button-success"
+      />
+      <InputText
+        v-model="searchQuery"
+        :placeholder="$t('common.search')"
+        class="p-inputtext-sm"
       />
     </div>
 
-    <DataTable :value="categories" :loading="loading" class="p-datatable-sm">
+    <DataTable
+      :value="filteredCategories"
+      :loading="loading"
+      class="p-datatable-sm"
+      :paginator="true"
+      :rows="10"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+      responsiveLayout="scroll"
+    >
       <Column field="name" :header="$t('pages.categories.name')" sortable>
         <template #body="{ data }">
           <div class="flex items-center">
-            <i :class="data.icon" class="mr-2"></i>
+            <i :class="getCategoryIcon(data.type?.name)" class="mr-2"></i>
             {{ data.name }}
           </div>
         </template>
       </Column>
+      <Column field="type.name" :header="$t('pages.categories.type')" sortable>
+        <template #body="{ data }">
+          {{ $t(`pages.categories.categoryTypes.${data.type?.name}`) }}
+        </template>
+      </Column>
       <Column
-        field="type.name"
-        :header="$t('pages.categories.type')"
-        sortable
-      ></Column>
-      <Column :header="$t('common.actions')">
+        :header="$t('common.actions')"
+        :exportable="false"
+        style="min-width: 8rem"
+      >
         <template #body="{ data }">
           <Button
             icon="pi pi-pencil"
-            class="p-button-text p-button-sm"
+            class="p-button-rounded p-button-success mr-2"
             @click="editCategory(data)"
           />
           <Button
             icon="pi pi-trash"
-            class="p-button-text p-button-sm p-button-danger"
+            class="p-button-rounded p-button-danger"
             @click="confirmDeleteCategory(data)"
           />
         </template>
@@ -42,11 +60,7 @@
 
     <Dialog
       v-model:visible="categoryDialogVisible"
-      :header="
-        dialogMode === 'create'
-          ? $t('pages.categories.addNew')
-          : $t('pages.categories.edit')
-      "
+      :header="dialogHeader"
       :modal="true"
       class="p-fluid"
     >
@@ -57,7 +71,17 @@
           v-model="editingCategory.name"
           required
           autofocus
+          :class="{
+            'p-invalid': v$.editingCategory.name.$invalid && submitted,
+          }"
         />
+        <small
+          class="p-error"
+          v-if="v$.editingCategory.name.$invalid && submitted"
+          >{{
+            $t('validation.required', { field: $t('pages.categories.name') })
+          }}</small
+        >
       </div>
       <div class="field">
         <label for="type">{{ $t('pages.categories.type') }}</label>
@@ -67,9 +91,23 @@
           :options="categoryTypes"
           optionLabel="name"
           optionValue="id"
-          placeholder="Select a type"
+          :placeholder="$t('pages.categories.selectType')"
           required
-        />
+          :class="{
+            'p-invalid': v$.editingCategory.type_id.$invalid && submitted,
+          }"
+        >
+          <template #option="slotProps">
+            {{ $t(`categoryTypes.${slotProps.option.name}`) }}
+          </template>
+        </Select>
+        <small
+          class="p-error"
+          v-if="v$.editingCategory.type_id.$invalid && submitted"
+          >{{
+            $t('validation.required', { field: $t('pages.categories.type') })
+          }}</small
+        >
       </div>
       <template #footer>
         <Button
@@ -92,13 +130,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useVuelidate } from '@vuelidate/core'
+import { required } from '@vuelidate/validators'
 import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import { useI18n } from 'vue-i18n'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { useAuthStore } from '@/stores/authStore'
-import type { Category, CategoryType } from '@/types/category'
+import type { Category } from '@/types/category'
 import { storeToRefs } from 'pinia'
 
 const categoryStore = useCategoryStore()
@@ -108,105 +148,105 @@ const toast = useToast()
 const { t } = useI18n()
 
 const { appUser } = storeToRefs(authStore)
+const { categories, categoryTypes } = storeToRefs(categoryStore)
 
-const categories = ref<Category[]>([])
-const categoryTypes = ref<CategoryType[]>([])
 const loading = ref(true)
 const categoryDialogVisible = ref(false)
 const dialogMode = ref<'create' | 'edit'>('create')
 const editingCategory = ref<Partial<Category>>({})
+const submitted = ref(false)
+const searchQuery = ref('')
 
-onMounted(async () => {
-  await fetchCategories()
-  await fetchCategoryTypes()
+const rules = computed(() => ({
+  editingCategory: {
+    name: { required },
+    type_id: { required },
+  },
+}))
+
+const v$ = useVuelidate(rules, { editingCategory })
+
+const filteredCategories = computed(() => {
+  return categories.value.filter(
+    (category) =>
+      category.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      t(`categoryTypes.${category.type?.name}`)
+        .toLowerCase()
+        .includes(searchQuery.value.toLowerCase())
+  )
 })
 
-async function fetchCategories() {
+const dialogHeader = computed(() =>
+  dialogMode.value === 'create'
+    ? t('pages.categories.addNew')
+    : t('pages.categories.edit')
+)
+
+onMounted(async () => {
+  await fetchData()
+})
+
+async function fetchData() {
   loading.value = true
   try {
     if (appUser.value) {
-      await categoryStore.fetchUserCategories(appUser.value.id)
-      categories.value = categoryStore.categories
+      await Promise.all([
+        categoryStore.fetchUserCategories(appUser.value.id),
+        categoryStore.fetchCategoryTypes(),
+      ])
     }
   } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: t('common.error'),
-      detail: t('pages.categories.fetchError'),
-      life: 3000,
-    })
+    showErrorToast('pages.categories.fetchError')
   } finally {
     loading.value = false
-  }
-}
-
-async function fetchCategoryTypes() {
-  try {
-    await categoryStore.fetchCategoryTypes()
-    categoryTypes.value = categoryStore.categoryTypes
-  } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: t('common.error'),
-      detail: t('pages.categories.typesError'),
-      life: 3000,
-    })
   }
 }
 
 function openNewCategoryDialog() {
   dialogMode.value = 'create'
   editingCategory.value = {}
+  submitted.value = false
   categoryDialogVisible.value = true
 }
 
 function editCategory(category: Category) {
   dialogMode.value = 'edit'
   editingCategory.value = { ...category }
+  submitted.value = false
   categoryDialogVisible.value = true
 }
 
 function closeCategoryDialog() {
   categoryDialogVisible.value = false
   editingCategory.value = {}
+  v$.value.$reset()
 }
 
 async function saveCategory() {
+  submitted.value = true
+  const isValid = await v$.value.$validate()
+  if (!isValid) return
+
   try {
     if (dialogMode.value === 'create') {
       await categoryStore.createCategory({
         ...editingCategory.value,
         user_id: appUser.value?.id,
       })
-      toast.add({
-        severity: 'success',
-        summary: t('common.success'),
-        detail: t('pages.categories.createSuccess'),
-        life: 3000,
-      })
+      showSuccessToast('pages.categories.createSuccess')
     } else {
       if (editingCategory.value.id) {
         await categoryStore.updateCategory(
           editingCategory.value.id,
           editingCategory.value
         )
-        toast.add({
-          severity: 'success',
-          summary: t('common.success'),
-          detail: t('pages.categories.updateSuccess'),
-          life: 3000,
-        })
+        showSuccessToast('pages.categories.updateSuccess')
       }
     }
     closeCategoryDialog()
-    await fetchCategories()
+    await fetchData()
   } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: t('common.error'),
-      detail: t('pages.categories.saveError'),
-      life: 3000,
-    })
+    showErrorToast('pages.categories.saveError')
   }
 }
 
@@ -215,6 +255,7 @@ function confirmDeleteCategory(category: Category) {
     message: t('pages.categories.deleteConfirm'),
     header: t('common.confirmDelete'),
     icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
     accept: () => deleteCategory(category),
   })
 }
@@ -223,21 +264,40 @@ async function deleteCategory(category: Category) {
   try {
     if (category.id) {
       await categoryStore.deleteCategory(category.id)
-      toast.add({
-        severity: 'success',
-        summary: t('common.success'),
-        detail: t('pages.categories.deleteSuccess'),
-        life: 3000,
-      })
-      await fetchCategories()
+      showSuccessToast('pages.categories.deleteSuccess')
+      await fetchData()
     }
   } catch (error) {
-    toast.add({
-      severity: 'error',
-      summary: t('common.error'),
-      detail: t('pages.categories.deleteError'),
-      life: 3000,
-    })
+    showErrorToast('pages.categories.deleteError')
   }
+}
+
+function showSuccessToast(key: string) {
+  toast.add({
+    severity: 'success',
+    summary: t('common.success'),
+    detail: t(key),
+    life: 3000,
+  })
+}
+
+function showErrorToast(key: string) {
+  toast.add({
+    severity: 'error',
+    summary: t('common.error'),
+    detail: t(key),
+    life: 3000,
+  })
+}
+
+function getCategoryIcon(typeName?: string) {
+  const iconMap: Record<string, string> = {
+    income: 'pi pi-dollar',
+    necessary_expense: 'pi pi-shopping-bag',
+    optional_expense: 'pi pi-ticket',
+    short_term_investment: 'pi pi-chart-line',
+    long_term_investment: 'pi pi-chart-bar',
+  }
+  return iconMap[typeName || ''] || 'pi pi-tag'
 }
 </script>

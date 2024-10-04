@@ -16,6 +16,34 @@ export interface Transaction {
   description: string | null
   created_at: string
   updated_at: string
+
+  // Relations
   category?: Category
   recurrence_frequency?: RecurrenceFrequency
+}
+
+type TransactionUpdateFields = Omit<
+  Transaction,
+  | 'id'
+  | 'user_id'
+  | 'created_at'
+  | 'updated_at'
+  | 'category'
+  | 'recurrence_frequency'
+>
+
+export function cleanTransactionUpdates(
+  updates: Partial<Transaction>
+): Partial<TransactionUpdateFields> {
+  const {
+    id,
+    user_id,
+    created_at,
+    updated_at,
+    category,
+    recurrence_frequency,
+    ...cleanUpdates
+  } = updates
+
+  return cleanUpdates
 }

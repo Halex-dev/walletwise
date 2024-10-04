@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { Transaction, RecurrenceFrequency } from '@/types/transaction'
+import {
+  type Transaction,
+  type RecurrenceFrequency,
+  cleanTransactionUpdates,
+} from '@/types/transaction'
 import { transactionService } from '@/services/supabase/transaction'
 import {
   startOfMonth,
@@ -81,9 +85,14 @@ export const useTransactionStore = defineStore('transaction', () => {
 
   const monthLabels = computed(() => {
     if (transactions.value.length === 0) return []
-    const dates = transactions.value.map((t) => parseISO(t.date))
-    const minDate = new Date(Math.min.apply(null, dates))
-    const maxDate = new Date(Math.max.apply(null, dates))
+
+    console.log(typeof transactions.value[0].date)
+    const dates = transactions.value.map((t) => parseISO(t.date.toString()))
+    const timestamps = dates.map((date) => date.getTime())
+
+    const minDate = new Date(Math.min(...timestamps))
+    const maxDate = new Date(Math.max(...timestamps))
+
     return eachMonthOfInterval({
       start: startOfMonth(minDate),
       end: endOfMonth(maxDate),
@@ -101,7 +110,7 @@ export const useTransactionStore = defineStore('transaction', () => {
     transactions.value
       .filter((t) => typeArray.includes(t.category?.type?.name || ''))
       .forEach((t) => {
-        const month = format(parseISO(t.date), 'MMM yyyy')
+        const month = format(parseISO(t.date.toLocaleString()), 'MMM yyyy')
         monthlyData[month] = (monthlyData[month] || 0) + t.amount
       })
     return monthLabels.value.map((month) => monthlyData[month] || 0)
@@ -148,13 +157,20 @@ export const useTransactionStore = defineStore('transaction', () => {
     updates: Partial<Transaction>
   ) {
     try {
+      const cleanUpdates = cleanTransactionUpdates(updates)
+
       const updatedTransaction = await transactionService.updateTransaction(
         transactionId,
-        updates
+        cleanUpdates
       )
+
       const index = transactions.value.findIndex((t) => t.id === transactionId)
       if (index !== -1) {
-        transactions.value[index] = updatedTransaction
+        // Merge the updated fields with the existing transaction
+        transactions.value[index] = {
+          ...transactions.value[index],
+          ...updatedTransaction,
+        }
       }
     } catch (error) {
       console.error('Error updating transaction:', error)

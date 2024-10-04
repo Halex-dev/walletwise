@@ -2,13 +2,111 @@
   "common": {
     "appName": "WalletWise",
     "darkMode": "Modalità Scura",
-    "lightMode": "Modalità Chiara"
+    "lightMode": "Modalità Chiara",
+    "loading": "Caricamento...",
+    "logout": "Esci",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "confirm": "Conferma",
+    "actions": "Azioni",
+    "confirmDelete": "Conferma Eliminazione",
+    "success": "Successo",
+    "error": "Errore",
+    "search": "Cerca",
+    "delete": "Elimina",
+    "edit": "Modifica"
   },
   "nav": {
-    "dashboard": "Cruscotto",
-    "expenses": "Spese",
-    "income": "Entrate",
-    "budget": "Budget",
-    "assets": "Patrimonio"
+    "dashboard": "Dashboard",
+    "transactions": "Transazioni",
+    "categories": "Categorie",
+    "settings": "Impostazioni"
+  },
+  "pages": {
+    "auth": {
+      "login": "Accedi",
+      "signInWithGoogle": "Accedi con Google",
+      "loginFailed": "Accesso fallito. Per favore riprova."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Bentornato,",
+      "totalIncome": "Entrate Totali",
+      "totalExpenses": "Spese Totali",
+      "shortTermInvestments": "Investimenti a Breve Termine",
+      "longTermInvestments": "Investimenti a Lungo Termine",
+      "totalInvestments": "Investimenti Totali",
+      "totalSavings": "Risparmi Totali",
+      "budgetAllocation": "Allocazione del Budget",
+      "necessities": "Necessità",
+      "wants": "Desideri",
+      "budgetRules": "Regole del Budget",
+      "viewAll": "Vedi Tutto",
+      "used": "Utilizzato",
+      "savings": "Risparmi",
+      "expensesByCategory": "Spese per categoria",
+      "incomeVsExpenses": "Entrate vs Spese",
+      "income": "Entrate",
+      "expenses": "Spese",
+      "amount": "Importo",
+      "recentTransactions": "Transazioni Recenti"
+    },
+    "categories": {
+      "title": "Categorie",
+      "addNew": "Aggiungi Nuova Categoria",
+      "name": "Nome",
+      "icon": "Icona",
+      "type": "Tipo",
+      "edit": "Modifica Categoria",
+      "deleteConfirm": "Sei sicuro di voler eliminare questa categoria?",
+      "createSuccess": "Categoria creata con successo",
+      "updateSuccess": "Categoria aggiornata con successo",
+      "deleteSuccess": "Categoria eliminata con successo",
+      "fetchError": "Errore nel recupero delle categorie",
+      "typesError": "Errore nel recupero dei tipi di categoria",
+      "saveError": "Errore nel salvataggio della categoria",
+      "deleteError": "Errore nell'eliminazione della categoria",
+      "selectType": "Seleziona Tipo",
+      "categoryTypes": {
+        "income": "Entrata",
+        "necessary_expense": "Spesa Necessaria",
+        "optional_expense": "Spesa Opzionale",
+        "short_term_investment": "Investimento a Breve Termine",
+        "long_term_investment": "Investimento a Lungo Termine"
+      }
+    },
+    "settings": {
+      "title": "Impostazioni Utente",
+      "personalInfo": "Informazioni Personali",
+      "username": "Nome Utente",
+      "email": "Email",
+      "preferences": "Preferenze",
+      "startDay": "Giorno di Inizio del Mese Finanziario",
+      "startDayDescription": "Questo determina il giorno del mese in cui inizia il tuo periodo finanziario.",
+      "saveChanges": "Salva Modifiche",
+      "days": {
+        "day": "Giorno {day}"
+      }
+    },
+    "transactions": {
+      "title": "Transazioni",
+      "new": "Nuova Transazione",
+      "edit": "Modifica Transazione",
+      "date": "Data",
+      "description": "Descrizione",
+      "category": "Categoria",
+      "amount": "Importo",
+      "totalIncome": "Entrate Totali",
+      "totalExpenses": "Spese Totali",
+      "balance": "Saldo",
+      "isRecurring": "È Ricorrente",
+      "recurrenceFrequency": "Frequenza di Ricorrenza",
+      "deleteConfirmation": "Sei sicuro di voler eliminare questa transazione?",
+      "createSuccess": "Transazione creata con successo",
+      "updateSuccess": "Transazione aggiornata con successo",
+      "deleteSuccess": "Transazione eliminata con successo",
+      "errorOccurred": "Si è verificato un errore. Per favore riprova.",
+      "newTransaction": "Nuova Transazione"
+    }
   }
 }

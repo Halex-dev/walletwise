@@ -86,7 +86,6 @@ export const useTransactionStore = defineStore('transaction', () => {
   const monthLabels = computed(() => {
     if (transactions.value.length === 0) return []
 
-    console.log(typeof transactions.value[0].date)
     const dates = transactions.value.map((t) => parseISO(t.date.toString()))
     const timestamps = dates.map((date) => date.getTime())
 

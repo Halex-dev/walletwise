@@ -12,7 +12,9 @@
     "confirmDelete": "Confirm Delete",
     "success": "Success",
     "error": "Error",
-    "search": "Search"
+    "search": "Search",
+    "delete": "Delete",
+    "edit": "Edit"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -39,6 +41,8 @@
       "necessities": "Necessities",
       "wants": "Wants",
       "budgetRules": "Budget Rules",
+      "viewAll": "View All",
+      "used": "Used",
       "savings": "Savings",
       "expensesByCategory": "Expenses by category",
       "incomeVsExpenses": "Income vs Expenses",
@@ -62,6 +66,7 @@
       "typesError": "Error fetching category types",
       "saveError": "Error saving category",
       "deleteError": "Error deleting category",
+      "selectType": "Select Type",
       "categoryTypes": {
         "income": "Income",
         "necessary_expense": "Necessary Expense",

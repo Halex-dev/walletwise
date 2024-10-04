@@ -31,11 +31,10 @@ export const roundToTwoDecimals = (value: number) => {
   return Math.round(value * 100) / 100
 }
 
-export const formatPercentage = (value: number) => {
-  return (
-    (value * 100).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }) + '%'
-  )
+export const formatPercentage = (value: number): string => {
+  return (value * 100).toFixed(2) + '%'
+}
+
+export const calculatePercentage = (spent: number, limit: number): number => {
+  return Math.min(Math.round((spent / limit) * 100), 100)
 }

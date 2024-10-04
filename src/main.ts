@@ -13,6 +13,8 @@ import Aura from '@primevue/themes/aura'
 import i18n from './config/i18n'
 import ToastService from 'primevue/toastservice'
 import ConfirmationService from 'primevue/confirmationservice'
+import Tooltip from 'primevue/tooltip'
+
 // Pinia
 import { createPinia } from 'pinia'
 const pinia = createPinia()
@@ -33,6 +35,7 @@ app.use(PrimeVue, {
   ripple: true,
   unstyled: false,
 })
+app.directive('tooltip', Tooltip)
 app.use(ToastService)
 app.use(ConfirmationService)
 app.use(i18n)

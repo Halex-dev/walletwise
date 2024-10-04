@@ -1,77 +1,76 @@
-<!-- DashboardView.vue -->
 <template>
-  <div class="p-4 bg-surface text-text">
-    <h1 class="text-3xl font-bold mb-6">
+  <div class="dashboard p-4 md:p-6 lg:p-8 bg-surface text-text">
+    <h1 class="text-3xl font-bold mb-8">
       {{ $t('pages.dashboard.welcome') }} {{ appUser?.username }}
     </h1>
 
-    <!-- Sommario finanziario -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <!-- Financial Summary -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card
         v-for="(summary, index) in financialSummary"
         :key="index"
-        class="shadow-md"
+        class="shadow-lg hover:shadow-xl transition-shadow duration-300"
       >
-        <template #header>
-          <div
-            class="flex items-center justify-between p-3 bg-primary bg-opacity-10"
-          >
-            <i :class="summary.icon" class="text-2xl text-primary"></i>
-            <span class="text-sm font-semibold">{{ $t(summary.label) }}</span>
-          </div>
-        </template>
         <template #content>
-          <div class="text-center">
-            <span class="text-2xl font-bold" :class="summary.colorClass">
-              {{ formatCurrency(summary.value) }}
-            </span>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-500 mb-1">
+                {{ $t(summary.label) }}
+              </h3>
+              <p :class="['text-2xl font-bold', summary.colorClass]">
+                {{ formatCurrency(summary.value) }}
+              </p>
+            </div>
+            <i :class="[summary.icon, 'text-3xl', summary.iconColorClass]"></i>
           </div>
         </template>
       </Card>
     </div>
 
-    <!-- Regole di budget -->
-    <Card class="shadow-md mb-8">
-      <template #header>
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold">
-            {{ $t('pages.dashboard.budgetRules') }}
-          </h2>
-          <Select
-            v-model="selectedBudgetRule"
-            :options="budgetRules"
-            optionLabel="name"
-            class="w-40"
-          />
-        </div>
-      </template>
-      <template #content>
-        <div
-          v-for="(category, index) in selectedBudgetRule.categories"
-          :key="index"
-          class="mb-4"
-        >
-          <div class="flex justify-between mb-2">
-            <span class="font-semibold">{{ category.name }}</span>
-            <span>
-              {{ formatCurrency(category.spent) }} /
-              {{ formatCurrency(category.limit) }} ({{
-                formatPercentage(category.spent / category.limit)
-              }})
-            </span>
-          </div>
-          <ProgressBar
-            :value="(category.spent / category.limit) * 100"
-            :class="category.colorClass"
-          />
-        </div>
-      </template>
-    </Card>
-
-    <!-- Grafici -->
+    <!-- Budget Rules and Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-      <!-- Grafico a linee per entrate e spese -->
-      <Card class="shadow-md">
+      <!-- Budget Rules -->
+      <Card class="shadow-lg">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold">
+              {{ $t('pages.dashboard.budgetRules') }}
+            </h2>
+            <Select
+              v-model="selectedBudgetRule"
+              :options="budgetRules"
+              optionLabel="name"
+              class="w-48"
+            />
+          </div>
+        </template>
+        <template #content>
+          <div
+            v-for="(category, index) in selectedBudgetRule.categories"
+            :key="index"
+            class="mb-6"
+          >
+            <div class="flex justify-between mb-2">
+              <span class="font-semibold">{{ category.name }}</span>
+              <span :class="getBudgetStatusClass(category)">
+                {{ formatCurrency(category.spent) }} /
+                {{ formatCurrency(category.limit) }}
+              </span>
+            </div>
+            <ProgressBar
+              :value="calculatePercentage(category.spent, category.limit)"
+              :class="category.colorClass"
+            />
+            <small class="text-gray-500">
+              {{ formatPercentage(category.spent / category.limit) }}
+              {{ $t('pages.dashboard.used') }}
+            </small>
+          </div>
+        </template>
+      </Card>
+
+      <!-- Income vs Expenses Chart -->
+      <Card class="shadow-lg">
         <template #header>
           <h2 class="text-xl font-semibold">
             {{ $t('pages.dashboard.incomeVsExpenses') }}
@@ -82,13 +81,16 @@
             type="line"
             :data="incomeVsExpensesData"
             :options="lineChartOptions"
-            class="h-64"
+            class="h-80"
           />
         </template>
       </Card>
+    </div>
 
-      <!-- Grafico a torta per categorie di spesa -->
-      <Card class="shadow-md">
+    <!-- Expenses by Category and Recent Transactions -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Expenses by Category Chart -->
+      <Card class="shadow-lg">
         <template #header>
           <h2 class="text-xl font-semibold">
             {{ $t('pages.dashboard.expensesByCategory') }}
@@ -96,82 +98,92 @@
         </template>
         <template #content>
           <Chart
-            type="pie"
+            type="doughnut"
             :data="expensesByCategoryData"
-            :options="pieChartOptions"
-            class="h-64"
+            :options="doughnutChartOptions"
+            class="h-80"
           />
         </template>
       </Card>
-    </div>
 
-    <!-- Ultime transazioni -->
-    <Card class="shadow-md mb-8">
-      <template #header>
-        <h2 class="text-xl font-semibold">
-          {{ $t('pages.dashboard.recentTransactions') }}
-        </h2>
-      </template>
-      <template #content>
-        <DataTable
-          :value="recentTransactions"
-          :rows="5"
-          :paginator="true"
-          responsive-layout="stack"
-          class="p-datatable-sm"
-        >
-          <Column
-            field="category.name"
-            :header="$t('pages.transactions.category')"
-            sortable
+      <!-- Recent Transactions -->
+      <Card class="shadow-lg">
+        <template #header>
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold">
+              {{ $t('pages.dashboard.recentTransactions') }}
+            </h2>
+            <Button
+              :label="$t('pages.dashboard.viewAll')"
+              class="p-button-text"
+              @click="navigateToTransactions"
+            />
+          </div>
+        </template>
+        <template #content>
+          <DataTable
+            :value="recentTransactions"
+            :rows="5"
+            :paginator="false"
+            responsive-layout="stack"
+            class="p-datatable-sm"
           >
-            <template #body="slotProps">
-              <div class="flex items-center">
-                <i
-                  :class="getCategoryIcon(slotProps.data.category)"
-                  class="mr-2"
-                ></i>
-                {{ slotProps.data.category.name }}
-              </div>
-            </template>
-          </Column>
-          <Column
-            field="amount"
-            :header="$t('pages.transactions.amount')"
-            sortable
-          >
-            <template #body="slotProps">
-              <span :class="getAmountClass(slotProps.data)">
-                {{ formatCurrency(slotProps.data.amount) }}
-              </span>
-            </template>
-          </Column>
-          <Column
-            field="description"
-            :header="$t('pages.transactions.description')"
-            class="hidden sm:table-cell"
-          />
-          <Column field="date" :header="$t('pages.transactions.date')" sortable>
-            <template #body="slotProps">
-              {{ formatDate(slotProps.data.date) }}
-            </template>
-          </Column>
-        </DataTable>
-      </template>
-    </Card>
+            <Column
+              field="category.name"
+              :header="$t('pages.transactions.category')"
+              sortable
+            >
+              <template #body="slotProps">
+                <Tag
+                  :value="slotProps.data.category.name"
+                  :severity="getCategorySeverity(slotProps.data.category)"
+                />
+              </template>
+            </Column>
+            <Column
+              field="amount"
+              :header="$t('pages.transactions.amount')"
+              sortable
+            >
+              <template #body="slotProps">
+                <span :class="getAmountClass(slotProps.data)">
+                  {{ formatCurrency(slotProps.data.amount) }}
+                </span>
+              </template>
+            </Column>
+            <Column
+              field="date"
+              :header="$t('pages.transactions.date')"
+              sortable
+            >
+              <template #body="slotProps">
+                {{ formatDate(slotProps.data.date) }}
+              </template>
+            </Column>
+          </DataTable>
+        </template>
+      </Card>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useTransactionStore } from '@/stores/transactionStore'
-import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore'
-import { formatCurrency, formatDate, formatPercentage } from '@/utils/utils'
+import { storeToRefs } from 'pinia'
+import {
+  formatCurrency,
+  formatDate,
+  formatPercentage,
+  calculatePercentage,
+} from '@/utils/utils'
 import { calculateDateRange, formatDateForAPI } from '@/utils/date'
 
 const { t } = useI18n()
+const router = useRouter()
 const transactionStore = useTransactionStore()
 const authStore = useAuthStore()
 
@@ -193,25 +205,29 @@ const financialSummary = computed(() => [
   {
     label: 'pages.dashboard.totalIncome',
     value: totalIncome.value,
-    colorClass: 'text-green-500',
+    colorClass: 'text-green-600',
+    iconColorClass: 'text-green-400',
     icon: 'pi pi-dollar',
   },
   {
     label: 'pages.dashboard.totalExpenses',
     value: totalExpenses.value,
-    colorClass: 'text-red-500',
+    colorClass: 'text-red-600',
+    iconColorClass: 'text-red-400',
     icon: 'pi pi-shopping-cart',
   },
   {
     label: 'pages.dashboard.totalInvestments',
     value: totalShortInvestment.value + totalLongInvestment.value,
-    colorClass: 'text-blue-500',
+    colorClass: 'text-blue-600',
+    iconColorClass: 'text-blue-400',
     icon: 'pi pi-chart-line',
   },
   {
     label: 'pages.dashboard.totalSavings',
     value: totalIncome.value - totalExpenses.value,
-    colorClass: 'text-purple-500',
+    colorClass: 'text-purple-600',
+    iconColorClass: 'text-purple-400',
     icon: 'pi pi-wallet',
   },
 ])
@@ -268,13 +284,17 @@ const incomeVsExpensesData = computed(() => ({
       label: t('pages.dashboard.income'),
       data: transactionStore.monthlyIncome,
       borderColor: '#4CAF50',
+      backgroundColor: 'rgba(76, 175, 80, 0.2)',
       tension: 0.4,
+      fill: true,
     },
     {
       label: t('pages.dashboard.expenses'),
       data: transactionStore.monthlyExpenses,
       borderColor: '#F44336',
+      backgroundColor: 'rgba(244, 67, 54, 0.2)',
       tension: 0.4,
+      fill: true,
     },
   ],
 }))
@@ -307,10 +327,19 @@ const lineChartOptions = {
     legend: {
       position: 'bottom',
     },
+    tooltip: {
+      mode: 'index',
+      intersect: false,
+    },
+  },
+  scales: {
+    y: {
+      beginAtZero: true,
+    },
   },
 }
 
-const pieChartOptions = {
+const doughnutChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -322,20 +351,26 @@ const pieChartOptions = {
 
 const getAmountClass = (transaction: any) => {
   return transaction.category?.type?.name === 'income'
-    ? 'text-green-500'
-    : 'text-red-500'
+    ? 'text-green-600'
+    : 'text-red-600'
 }
 
-const getCategoryIcon = (category: any) => {
-  // Implementa la logica per ottenere l'icona della categoria
-  const iconMap: { [key: string]: string } = {
-    income: 'pi pi-dollar',
-    necessary_expense: 'pi pi-home',
-    optional_expense: 'pi pi-shopping-cart',
-    short_term_investment: 'pi pi-chart-line',
-    long_term_investment: 'pi pi-chart-bar',
+const getCategorySeverity = (category: any) => {
+  const severityMap: { [key: string]: string } = {
+    income: 'success',
+    necessary_expense: 'warning',
+    optional_expense: 'danger',
+    short_term_investment: 'info',
+    long_term_investment: 'info',
   }
-  return iconMap[category?.type?.name] || 'pi pi-tag'
+  return severityMap[category?.type?.name] || 'secondary'
+}
+
+const getBudgetStatusClass = (category: any) => {
+  const ratio = category.spent / category.limit
+  if (ratio > 1) return 'text-red-600'
+  if (ratio > 0.9) return 'text-yellow-600'
+  return 'text-green-600'
 }
 
 async function fetchTransactions() {
@@ -347,6 +382,10 @@ async function fetchTransactions() {
     formatDateForAPI(dateRange[0]),
     formatDateForAPI(dateRange[1])
   )
+}
+
+function navigateToTransactions() {
+  router.push({ name: 'transactions' })
 }
 
 onMounted(async () => {

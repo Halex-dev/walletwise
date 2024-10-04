@@ -1,41 +1,52 @@
 <template>
-  <div class="category-page">
-    <h1 class="text-2xl font-bold mb-4">{{ $t('pages.categories.title') }}</h1>
+  <div class="categories-page p-4 md:p-6 lg:p-8">
+    <h1 class="text-3xl font-semibold mb-6">
+      {{ $t('pages.categories.title') }}
+    </h1>
 
-    <div class="mb-4 flex justify-between items-center">
+    <div
+      class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+    >
       <Button
         @click="openNewCategoryDialog"
         :label="$t('pages.categories.addNew')"
         icon="pi pi-plus"
-        class="p-button-success"
+        class="p-button-primary w-full sm:w-auto"
       />
-      <InputText
-        v-model="searchQuery"
-        :placeholder="$t('common.search')"
-        class="p-inputtext-sm"
-      />
+      <span class="p-input-icon-left w-full sm:w-auto">
+        <i class="pi pi-search" />
+        <InputText
+          v-model="searchQuery"
+          :placeholder="$t('common.search')"
+          class="w-full"
+        />
+      </span>
     </div>
 
     <DataTable
       :value="filteredCategories"
       :loading="loading"
-      class="p-datatable-sm"
+      class="p-datatable-sm p-datatable-striped"
       :paginator="true"
       :rows="10"
       :rowsPerPageOptions="[5, 10, 20, 50]"
-      responsiveLayout="scroll"
+      responsiveLayout="stack"
+      breakpoint="960px"
+      dataKey="id"
+      :scrollable="true"
+      scrollHeight="400px"
     >
       <Column field="name" :header="$t('pages.categories.name')" sortable>
         <template #body="{ data }">
-          <div class="flex items-center">
-            <i :class="getCategoryIcon(data.type?.name)" class="mr-2"></i>
-            {{ data.name }}
-          </div>
+          <span class="font-medium">{{ data.name }}</span>
         </template>
       </Column>
       <Column field="type.name" :header="$t('pages.categories.type')" sortable>
         <template #body="{ data }">
-          {{ $t(`pages.categories.categoryTypes.${data.type?.name}`) }}
+          <Tag
+            :value="$t(`pages.categories.categoryTypes.${data.type?.name}`)"
+            :severity="getCategoryTagSeverity(data.type?.name)"
+          />
         </template>
       </Column>
       <Column
@@ -44,16 +55,20 @@
         style="min-width: 8rem"
       >
         <template #body="{ data }">
-          <Button
-            icon="pi pi-pencil"
-            class="p-button-rounded p-button-success mr-2"
-            @click="editCategory(data)"
-          />
-          <Button
-            icon="pi pi-trash"
-            class="p-button-rounded p-button-danger"
-            @click="confirmDeleteCategory(data)"
-          />
+          <div class="flex gap-2">
+            <Button
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text"
+              @click="editCategory(data)"
+              v-tooltip="$t('common.edit')"
+            />
+            <Button
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger"
+              @click="confirmDeleteCategory(data)"
+              v-tooltip="$t('common.delete')"
+            />
+          </div>
         </template>
       </Column>
     </DataTable>
@@ -63,9 +78,12 @@
       :header="dialogHeader"
       :modal="true"
       class="p-fluid"
+      :style="{ width: '450px' }"
     >
-      <div class="field">
-        <label for="name">{{ $t('pages.categories.name') }}</label>
+      <div class="field mb-4">
+        <label for="name" class="font-medium mb-2 block">{{
+          $t('pages.categories.name')
+        }}</label>
         <InputText
           id="name"
           v-model="editingCategory.name"
@@ -76,15 +94,18 @@
           }"
         />
         <small
-          class="p-error"
+          class="p-error block mt-1"
           v-if="v$.editingCategory.name.$invalid && submitted"
-          >{{
-            $t('validation.required', { field: $t('pages.categories.name') })
-          }}</small
         >
+          {{
+            $t('validation.required', { field: $t('pages.categories.name') })
+          }}
+        </small>
       </div>
-      <div class="field">
-        <label for="type">{{ $t('pages.categories.type') }}</label>
+      <div class="field mb-4">
+        <label for="type" class="font-medium mb-2 block">{{
+          $t('pages.categories.type')
+        }}</label>
         <Select
           id="type"
           v-model="editingCategory.type_id"
@@ -98,16 +119,17 @@
           }"
         >
           <template #option="slotProps">
-            {{ $t(`categoryTypes.${slotProps.option.name}`) }}
+            {{ $t(`pages.categories.categoryTypes.${slotProps.option.name}`) }}
           </template>
         </Select>
         <small
-          class="p-error"
+          class="p-error block mt-1"
           v-if="v$.editingCategory.type_id.$invalid && submitted"
-          >{{
-            $t('validation.required', { field: $t('pages.categories.type') })
-          }}</small
         >
+          {{
+            $t('validation.required', { field: $t('pages.categories.type') })
+          }}
+        </small>
       </div>
       <template #footer>
         <Button
@@ -119,7 +141,7 @@
         <Button
           :label="$t('common.save')"
           icon="pi pi-check"
-          class="p-button-text"
+          class="p-button-primary"
           @click="saveCategory"
         />
       </template>
@@ -290,14 +312,14 @@ function showErrorToast(key: string) {
   })
 }
 
-function getCategoryIcon(typeName?: string) {
-  const iconMap: Record<string, string> = {
-    income: 'pi pi-dollar',
-    necessary_expense: 'pi pi-shopping-bag',
-    optional_expense: 'pi pi-ticket',
-    short_term_investment: 'pi pi-chart-line',
-    long_term_investment: 'pi pi-chart-bar',
+function getCategoryTagSeverity(typeName?: string): string {
+  const severityMap: Record<string, string> = {
+    income: 'success',
+    necessary_expense: 'warning',
+    optional_expense: 'danger',
+    short_term_investment: 'info',
+    long_term_investment: 'primary',
   }
-  return iconMap[typeName || ''] || 'pi pi-tag'
+  return severityMap[typeName || ''] || 'secondary'
 }
 </script>

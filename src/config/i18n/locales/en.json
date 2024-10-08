@@ -1,4 +1,5 @@
 {
+  "appName": "WalletWise",
   "common": {
     "appName": "WalletWise",
     "darkMode": "Dark Mode",
@@ -18,13 +19,14 @@
     "delete": "Delete",
     "yes": "Yes",
     "no": "No",
-    "edit": "Edit"
+    "edit": "Edit",
+    "languageChanged": "Language changed",
+    "logoutSuccess": "Logout successful"
   },
   "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "numeric": "Please enter a valid number",
-    "date": "Please enter a valid date"
+    "required": "Il campo {field} è obbligatorio",
+    "positive": "Il campo {field} deve essere maggiore di zero",
+    "fixErrors": "Per favore, correggi gli errori nel form prima di salvare"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -33,10 +35,44 @@
     "settings": "Settings"
   },
   "pages": {
+    "home": {
+      "tagline": "Your smart solution for personal financial management",
+      "welcome": "Welcome to WalletWise",
+      "description": "WalletWise is an intuitive personal finance management application designed to help you take control of your financial life. With powerful tools and a user-friendly interface, tracking expenses and planning your budget has never been easier.",
+      "features": {
+        "easyTracking": "Easy tracking of income and expenses",
+        "budgeting": "Advanced budgeting tools",
+        "insights": "Financial analysis and insights",
+        "secure": "Secure and private"
+      },
+      "getStarted": "Get Started",
+      "developmentNotice": "WalletWise is currently in active development. New features are being added regularly!",
+      "footer": "© 2024 WalletWise. All rights reserved."
+    },
+    "404": {
+      "title": "404 - Page Not Found",
+      "subtitle": "Oops! Looks like you're lost.",
+      "message": "The page you are looking for might have been moved, renamed, or might not exist.",
+      "backToHome": "Back to Home",
+      "goBack": "Go Back",
+      "helpMessage": "Need help?",
+      "contactSupport": "Contact support"
+    },
     "auth": {
       "login": "Login",
       "signInWithGoogle": "Sign in with Google",
-      "loginFailed": "Login failed. Please try again."
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "termsNotice": "Terms and Conditions",
+      "welcomeMessage": "Welcome to WalletWise",
+      "completingLogin": "Completing login...",
+      "verifyingCredentials": "Verifying credentials...",
+      "settingUpAccount": "Setting up account...",
+      "almostThere": "Almost there!",
+      "loginSuccessful": "Login successful",
+      "redirecting": "Redirecting to dashboard...",
+      "loginFailed": "Login failed. Please try again.",
+      "retryLogin": "Retry login"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -117,10 +153,10 @@
       "addTransaction": "Add Transaction",
       "isRecurring": "Is Recurring",
       "recurrenceFrequency": "Recurrence Frequency",
-      "deleteConfirmation": "Are you sure you want to delete this transaction?",
       "createSuccess": "Transaction created successfully",
       "updateSuccess": "Transaction updated successfully",
       "deleteSuccess": "Transaction deleted successfully",
+      "deleteConfirm": "Are you sure you want to delete this transaction?",
       "errorOccurred": "An error occurred. Please try again.",
       "newTransaction": "New Transaction",
       "descriptionPlaceholder": "Enter description (optional)"

@@ -17,11 +17,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/auth/LoginView.vue'),
       },
       {
-        path: 'logout',
-        name: 'Logout',
-        component: () => import('@/views/auth/LogoutView.vue'),
-      },
-      {
         path: 'auth/callback',
         name: 'AuthCallback',
         component: () => import('@/views/auth/AuthCallbackView.vue'),

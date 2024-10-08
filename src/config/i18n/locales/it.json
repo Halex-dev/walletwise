@@ -1,4 +1,5 @@
 {
+  "appName": "WalletWise",
   "common": {
     "appName": "WalletWise",
     "darkMode": "Modalità Scura",
@@ -12,9 +13,20 @@
     "confirmDelete": "Conferma Eliminazione",
     "success": "Successo",
     "error": "Errore",
+    "info": "Informazione",
+    "warning": "Avviso",
     "search": "Cerca",
     "delete": "Elimina",
-    "edit": "Modifica"
+    "yes": "Sì",
+    "no": "No",
+    "edit": "Modifica",
+    "languageChanged": "Lingua cambiata",
+    "logoutSuccess": "Disconnessione avvenuta con successo"
+  },
+  "validation": {
+    "required": "Il campo {field} è obbligatorio",
+    "positive": "Il campo {field} deve essere maggiore di zero",
+    "fixErrors": "Per favore, correggi gli errori nel modulo prima di salvare"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -23,16 +35,50 @@
     "settings": "Impostazioni"
   },
   "pages": {
+    "home": {
+      "tagline": "La tua soluzione intelligente per la gestione finanziaria personale",
+      "welcome": "Benvenuto in WalletWise",
+      "description": "WalletWise è un'applicazione intuitiva per la gestione delle finanze personali progettata per aiutarti a prendere il controllo della tua vita finanziaria. Con strumenti potenti e un'interfaccia user-friendly, tracciare le spese e pianificare il tuo budget non è mai stato così facile.",
+      "features": {
+        "easyTracking": "Facile tracciamento di entrate e uscite",
+        "budgeting": "Strumenti avanzati di budgeting",
+        "insights": "Analisi e approfondimenti finanziari",
+        "secure": "Sicuro e privato"
+      },
+      "getStarted": "Inizia Ora",
+      "developmentNotice": "WalletWise è attualmente in fase di sviluppo attivo. Nuove funzionalità vengono aggiunte regolarmente!",
+      "footer": "© 2024 WalletWise. Tutti i diritti riservati."
+    },
+    "404": {
+      "title": "404 - Pagina Non Trovata",
+      "subtitle": "Ops! Sembra che ti sia perso.",
+      "message": "La pagina che stai cercando potrebbe essere stata spostata, rinominata o potrebbe non esistere.",
+      "backToHome": "Torna alla Home",
+      "goBack": "Torna Indietro",
+      "helpMessage": "Hai bisogno di aiuto?",
+      "contactSupport": "Contatta il supporto"
+    },
     "auth": {
       "login": "Accedi",
       "signInWithGoogle": "Accedi con Google",
-      "loginFailed": "Accesso fallito. Per favore riprova."
+      "termsOfService": "Termini di Servizio",
+      "privacyPolicy": "Informativa sulla Privacy",
+      "termsNotice": "Termini e Condizioni",
+      "welcomeMessage": "Benvenuto in WalletWise",
+      "completingLogin": "Completamento dell'accesso...",
+      "verifyingCredentials": "Verifica delle credenziali...",
+      "settingUpAccount": "Configurazione dell'account...",
+      "almostThere": "Ci siamo quasi!",
+      "loginSuccessful": "Accesso riuscito",
+      "redirecting": "Reindirizzamento alla dashboard...",
+      "loginFailed": "Accesso fallito. Per favore riprova.",
+      "retryLogin": "Riprova l'accesso"
     },
     "dashboard": {
       "title": "Dashboard",
       "welcome": "Bentornato,",
       "totalIncome": "Entrate Totali",
-      "totalExpenses": "Spese Totali",
+      "totalExpenses": "Uscite Totali",
       "shortTermInvestments": "Investimenti a Breve Termine",
       "longTermInvestments": "Investimenti a Lungo Termine",
       "totalInvestments": "Investimenti Totali",
@@ -45,9 +91,9 @@
       "used": "Utilizzato",
       "savings": "Risparmi",
       "expensesByCategory": "Spese per categoria",
-      "incomeVsExpenses": "Entrate vs Spese",
+      "incomeVsExpenses": "Entrate vs Uscite",
       "income": "Entrate",
-      "expenses": "Spese",
+      "expenses": "Uscite",
       "amount": "Importo",
       "recentTransactions": "Transazioni Recenti"
     },
@@ -67,6 +113,8 @@
       "saveError": "Errore nel salvataggio della categoria",
       "deleteError": "Errore nell'eliminazione della categoria",
       "selectType": "Seleziona Tipo",
+      "filterByType": "Filtra per Tipo",
+      "allTypes": "Tutti i Tipi",
       "categoryTypes": {
         "income": "Entrata",
         "necessary_expense": "Spesa Necessaria",
@@ -82,7 +130,7 @@
       "email": "Email",
       "preferences": "Preferenze",
       "startDay": "Giorno di Inizio del Mese Finanziario",
-      "startDayDescription": "Questo determina il giorno del mese in cui inizia il tuo periodo finanziario.",
+      "startDayDescription": "Questo determina in quale giorno del mese inizia il tuo periodo finanziario.",
       "saveChanges": "Salva Modifiche",
       "days": {
         "day": "Giorno {day}"
@@ -97,16 +145,21 @@
       "category": "Categoria",
       "amount": "Importo",
       "totalIncome": "Entrate Totali",
-      "totalExpenses": "Spese Totali",
+      "totalExpenses": "Uscite Totali",
       "balance": "Saldo",
+      "selectCategory": "Seleziona Categoria",
+      "selectDateRange": "Seleziona Intervallo di Date",
+      "allCategories": "Tutte le Categorie",
+      "addTransaction": "Aggiungi Transazione",
       "isRecurring": "È Ricorrente",
       "recurrenceFrequency": "Frequenza di Ricorrenza",
-      "deleteConfirmation": "Sei sicuro di voler eliminare questa transazione?",
       "createSuccess": "Transazione creata con successo",
       "updateSuccess": "Transazione aggiornata con successo",
       "deleteSuccess": "Transazione eliminata con successo",
+      "deleteConfirm": "Sei sicuro di voler eliminare questa transazione?",
       "errorOccurred": "Si è verificato un errore. Per favore riprova.",
-      "newTransaction": "Nuova Transazione"
+      "newTransaction": "Nuova Transazione",
+      "descriptionPlaceholder": "Inserisci descrizione (opzionale)"
     }
   }
 }

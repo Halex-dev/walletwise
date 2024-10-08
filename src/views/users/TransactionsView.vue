@@ -141,7 +141,18 @@
             v-model="DateSelected"
             dateFormat="dd/mm/yy"
             class="w-full"
+            :class="{
+              'p-invalid': v$.DateSelected.$invalid && v$.DateSelected.$dirty,
+            }"
           />
+          <small
+            class="p-error"
+            v-if="v$.DateSelected.$invalid && v$.DateSelected.$dirty"
+          >
+            {{
+              t('validation.required', { field: t('pages.transactions.date') })
+            }}
+          </small>
         </div>
         <div class="field">
           <label for="category" class="font-medium">{{
@@ -155,7 +166,25 @@
             optionValue="id"
             :placeholder="t('pages.transactions.selectCategory')"
             class="w-full"
+            :class="{
+              'p-invalid':
+                v$.currentTransaction.category_id.$invalid &&
+                v$.currentTransaction.category_id.$dirty,
+            }"
           />
+          <small
+            class="p-error"
+            v-if="
+              v$.currentTransaction.category_id.$invalid &&
+              v$.currentTransaction.category_id.$dirty
+            "
+          >
+            {{
+              t('validation.required', {
+                field: t('pages.transactions.category'),
+              })
+            }}
+          </small>
         </div>
         <div class="field md:col-span-2">
           <label for="description" class="font-medium">{{
@@ -178,7 +207,34 @@
             currency="EUR"
             locale="it-IT"
             class="w-full"
+            :class="{
+              'p-invalid':
+                v$.currentTransaction.amount.$invalid &&
+                v$.currentTransaction.amount.$dirty,
+            }"
           />
+          <small
+            class="p-error"
+            v-if="
+              v$.currentTransaction.amount.$invalid &&
+              v$.currentTransaction.amount.$dirty
+            "
+          >
+            <span v-if="v$.currentTransaction.amount.required.$invalid">
+              {{
+                t('validation.required', {
+                  field: t('pages.transactions.amount'),
+                })
+              }}
+            </span>
+            <span v-else-if="v$.currentTransaction.amount.positive.$invalid">
+              {{
+                t('validation.positive', {
+                  field: t('pages.transactions.amount'),
+                })
+              }}
+            </span>
+          </small>
         </div>
         <div class="field md:col-span-2">
           <label for="isRecurring" class="font-medium">{{
@@ -217,6 +273,7 @@
           icon="pi pi-check"
           @click="saveTransaction"
           class="wallet-btn-primary"
+          :disabled="v$.$invalid"
           autofocus
         />
       </template>
@@ -240,6 +297,8 @@ import { useConfirm } from 'primevue/useconfirm'
 import { getAmountColor, getCategoryTagSeverity } from '@/utils/colors'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
+import { useVuelidate } from '@vuelidate/core'
+import { required, minValue } from '@vuelidate/validators'
 
 const transactionStore = useTransactionStore()
 const categoryStore = useCategoryStore()
@@ -257,7 +316,6 @@ const dateRange = ref<Date[]>([])
 const selectedCategory = ref<Category | null>(null)
 const transactionModalVisible = ref(false)
 const isEditing = ref(false)
-const currentTransaction = ref<Partial<Transaction>>({})
 const loading = ref(true)
 
 const categories = computed(() => categoryStore.categories)
@@ -266,6 +324,27 @@ const recurrenceFrequencies = computed(
 )
 
 const DateSelected = ref<Date>(new Date())
+
+const currentTransaction = ref<Partial<Transaction>>({
+  date: formatDateForAPI(new Date()),
+  category_id: '',
+  amount: 0,
+  is_recurring: false,
+  description: '',
+})
+
+const rules = computed(() => ({
+  DateSelected: { required },
+  currentTransaction: {
+    category_id: { required },
+    amount: {
+      required,
+      positive: minValue(0.01), // Assicura che l'importo sia maggiore di zero
+    },
+  },
+}))
+
+const v$ = useVuelidate(rules, { DateSelected, currentTransaction })
 
 const categoryOptions = computed(() => [
   { name: t('pages.transactions.allCategories'), id: null },
@@ -342,10 +421,24 @@ function editTransaction(transaction: Transaction) {
 
 function closeTransactionModal() {
   transactionModalVisible.value = false
-  currentTransaction.value = {}
+  currentTransaction.value = {
+    date: formatDateForAPI(new Date()),
+    category_id: '',
+    amount: 0,
+    is_recurring: false,
+    description: '',
+  }
+  DateSelected.value = new Date()
+  v$.value.$reset()
 }
 
 async function saveTransaction() {
+  v$.value.$touch()
+  if (v$.value.$invalid) {
+    toastManager.showError(t('validation.fixErrors'))
+    return
+  }
+
   try {
     if (isEditing.value) {
       await transactionStore.updateTransaction(
@@ -357,6 +450,7 @@ async function saveTransaction() {
       await transactionStore.createTransaction({
         ...currentTransaction.value,
         user_id: appUser.value?.id,
+        date: formatDateForAPI(DateSelected.value), // Assicurati di usare la data selezionata
       })
       toastManager.showSuccess(t('pages.transactions.createSuccess'))
     }

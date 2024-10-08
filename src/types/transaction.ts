@@ -10,7 +10,7 @@ export interface Transaction {
   user_id: string
   category_id: string
   amount: number
-  date: Date
+  date: string
   is_recurring: boolean
   recurrence_frequency_id: number | null
   description: string | null

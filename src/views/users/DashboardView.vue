@@ -9,7 +9,7 @@
       <Card
         v-for="(summary, index) in financialSummary"
         :key="index"
-        class="shadow-lg hover:shadow-xl transition-shadow duration-300"
+        class="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
       >
         <template #content>
           <div class="flex items-center justify-between">
@@ -21,7 +21,7 @@
                 {{ formatCurrency(summary.value) }}
               </p>
             </div>
-            <i :class="[summary.icon, 'text-3xl', summary.iconColorClass]"></i>
+            <i :class="[summary.icon, 'text-4xl', summary.iconColorClass]"></i>
           </div>
         </template>
       </Card>
@@ -36,7 +36,7 @@
             <h2 class="text-xl font-semibold">
               {{ $t('pages.dashboard.budgetRules') }}
             </h2>
-            <Select
+            <Dropdown
               v-model="selectedBudgetRule"
               :options="budgetRules"
               optionLabel="name"
@@ -45,27 +45,33 @@
           </div>
         </template>
         <template #content>
-          <div
-            v-for="(category, index) in selectedBudgetRule.categories"
-            :key="index"
-            class="mb-6"
-          >
-            <div class="flex justify-between mb-2">
-              <span class="font-semibold">{{ category.name }}</span>
-              <span :class="getBudgetStatusClass(category)">
-                {{ formatCurrency(category.spent) }} /
-                {{ formatCurrency(category.limit) }}
-              </span>
+          <TransitionGroup name="list" tag="div">
+            <div
+              v-for="(category, index) in selectedBudgetRule.categories"
+              :key="category.name"
+              class="mb-6"
+            >
+              <div class="flex justify-between mb-2">
+                <span class="font-semibold">{{ category.name }}</span>
+                <span :class="getBudgetStatusClass(category)">
+                  {{ formatCurrency(category.spent) }} /
+                  {{ formatCurrency(category.limit) }}
+                </span>
+              </div>
+              <ProgressBar
+                :value="calculatePercentage(category.spent, category.limit)"
+                :class="category.colorClass"
+                :pt="{
+                  root: { class: 'h-4 rounded-full' },
+                  value: { class: 'rounded-full' },
+                }"
+              />
+              <small class="text-gray-500">
+                {{ formatPercentage(category.spent / category.limit) }}
+                {{ $t('pages.dashboard.used') }}
+              </small>
             </div>
-            <ProgressBar
-              :value="calculatePercentage(category.spent, category.limit)"
-              :class="category.colorClass"
-            />
-            <small class="text-gray-500">
-              {{ formatPercentage(category.spent / category.limit) }}
-              {{ $t('pages.dashboard.used') }}
-            </small>
-          </div>
+          </TransitionGroup>
         </template>
       </Card>
 
@@ -127,6 +133,14 @@
             :paginator="false"
             responsive-layout="stack"
             class="p-datatable-sm"
+            :pt="{
+              wrapper: { class: 'overflow-x-auto' },
+              headerCell: {
+                class:
+                  'bg-surface-100 text-surface-700 border-b border-surface-200 p-3',
+              },
+              bodyCell: { class: 'p-3 border-b border-surface-200' },
+            }"
           >
             <Column
               field="category.name"
@@ -136,7 +150,7 @@
               <template #body="slotProps">
                 <Tag
                   :value="slotProps.data.category.name"
-                  :severity="getCategorySeverity(slotProps.data.category)"
+                  :severity="getCategoryTagSeverity(slotProps.data.category)"
                 />
               </template>
             </Column>
@@ -168,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useTransactionStore } from '@/stores/transactionStore'
@@ -181,6 +195,7 @@ import {
   calculatePercentage,
 } from '@/utils/utils'
 import { calculateDateRange, formatDateForAPI } from '@/utils/date'
+import { getCategoryTagSeverity } from '@/utils/colors'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -324,46 +339,22 @@ const lineChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: {
-      position: 'bottom',
-    },
-    tooltip: {
-      mode: 'index',
-      intersect: false,
-    },
+    legend: { position: 'bottom' },
+    tooltip: { mode: 'index', intersect: false },
   },
-  scales: {
-    y: {
-      beginAtZero: true,
-    },
-  },
+  scales: { y: { beginAtZero: true } },
 }
 
 const doughnutChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'right',
-    },
-  },
+  plugins: { legend: { position: 'right' } },
 }
 
 const getAmountClass = (transaction: any) => {
   return transaction.category?.type?.name === 'income'
     ? 'text-green-600'
     : 'text-red-600'
-}
-
-const getCategorySeverity = (category: any) => {
-  const severityMap: { [key: string]: string } = {
-    income: 'success',
-    necessary_expense: 'warning',
-    optional_expense: 'danger',
-    short_term_investment: 'info',
-    long_term_investment: 'info',
-  }
-  return severityMap[category?.type?.name] || 'secondary'
 }
 
 const getBudgetStatusClass = (category: any) => {
@@ -394,5 +385,12 @@ onMounted(async () => {
   }
 
   selectedBudgetRule.value = budgetRules.value[0]
+})
+
+// Aggiungiamo un watch per aggiornare i dati quando l'utente cambia
+watch(appUser, async (newUser) => {
+  if (newUser) {
+    await fetchTransactions()
+  }
 })
 </script>

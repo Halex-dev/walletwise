@@ -16,6 +16,9 @@
         <button
           @click="toggleSidebar"
           class="p-2 rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-400"
+          :aria-label="
+            isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'
+          "
         >
           <i
             :class="[
@@ -51,6 +54,7 @@
               <button
                 @click="toggleSidebar"
                 class="text-surface-600 dark:text-surface-400 focus:outline-none focus:ring-2 focus:ring-primary-400 lg:hidden"
+                aria-label="Toggle sidebar"
               >
                 <i class="pi pi-bars"></i>
               </button>
@@ -70,7 +74,7 @@
                   isDark ? $t('common.lightMode') : $t('common.darkMode')
                 "
               />
-              <Select
+              <Dropdown
                 v-model="selectedLocale"
                 :options="localeOptions"
                 optionLabel="name"
@@ -116,6 +120,9 @@ const router = useRouter()
 const authStore = useAuthStore()
 const { isDark, toggleTheme } = useTheme()
 
+import { useToastManager } from '@/utils/toastManager'
+const toastManager = useToastManager()
+
 const selectedLocale = ref(localStorage.getItem('locale') || 'en')
 const isSidebarCollapsed = ref(
   localStorage.getItem('sidebarCollapsed') === 'true'
@@ -138,8 +145,6 @@ const menuItems = computed(() => [
     icon: 'pi-chart-line',
     to: '/user/categories',
   },
-  //{ label: t('nav.assets'), icon: 'pi-wallet', to: '/user/assets' },
-  //{ label: t('nav.reports'), icon: 'pi-chart-line', to: '/user/reports' },
   { label: t('nav.settings'), icon: 'pi-cog', to: '/user/settings' },
 ])
 
@@ -154,14 +159,21 @@ const toggleSidebar = () => {
 }
 
 const logout = async () => {
-  await authStore.logout()
-  router.push('/login')
+  try {
+    await authStore.logout()
+    router.push('/login')
+    toastManager.showSuccess(t('common.logoutSuccess'))
+  } catch (error) {
+    console.error('Logout error:', error)
+    toastManager.showError(t('common.logoutError'))
+  }
 }
 
 // Watch for locale changes
 watch(selectedLocale, (newLocale) => {
   locale.value = newLocale
   localStorage.setItem('locale', newLocale)
+  toastManager.showInfo(t('common.languageChanged'))
 })
 </script>
 

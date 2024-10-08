@@ -13,6 +13,7 @@ import {
   parseISO,
   format,
 } from 'date-fns'
+import { formatDateForAPI } from '@/utils/date'
 
 export const useTransactionStore = defineStore('transaction', () => {
   const transactions = ref<Transaction[]>([])
@@ -142,8 +143,14 @@ export const useTransactionStore = defineStore('transaction', () => {
 
   async function createTransaction(transaction: Partial<Transaction>) {
     try {
-      const newTransaction =
-        await transactionService.createTransaction(transaction)
+      if (!transaction.date) {
+        transaction.date = formatDateForAPI(new Date())
+      }
+
+      const newTransaction = await transactionService.createTransaction({
+        ...transaction,
+        date: formatDateForAPI(transaction.date),
+      })
       transactions.value.unshift(newTransaction)
     } catch (error) {
       console.error('Error creating transaction:', error)

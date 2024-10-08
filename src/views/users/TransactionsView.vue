@@ -1,12 +1,18 @@
 <template>
-  <div class="min-h-screen p-4 md:p-6 lg:p-8">
+  <div
+    class="transactions-page min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 dark:bg-gray-800"
+  >
     <div class="max-w-7xl mx-auto">
-      <h1 class="text-3xl md:text-4xl font-bold mb-8">
+      <h1
+        class="text-3xl md:text-4xl font-bold mb-8 text-gray-800 dark:text-white"
+      >
         {{ t('pages.transactions.title') }}
       </h1>
 
       <!-- Filters and Actions -->
-      <div class="wallet-card mb-6">
+      <div
+        class="wallet-card mb-6 p-4 bg-white dark:bg-gray-700 rounded-lg shadow-md"
+      >
         <div
           class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4"
         >
@@ -18,17 +24,18 @@
               selectionMode="range"
               :manualInput="false"
               class="w-full sm:w-64"
+              :placeholder="t('pages.transactions.selectDateRange')"
             />
             <Select
               v-model="selectedCategory"
-              :options="categories"
+              :options="categoryOptions"
               optionLabel="name"
-              placeholder="Select Category"
+              :placeholder="t('pages.transactions.selectCategory')"
               class="w-full sm:w-48"
             />
           </div>
           <Button
-            label="Add Transaction"
+            :label="t('pages.transactions.addTransaction')"
             icon="pi pi-plus"
             @click="openNewTransactionModal"
             class="wallet-btn-primary w-full md:w-auto"
@@ -37,42 +44,74 @@
       </div>
 
       <!-- Transactions Table -->
-      <div class="wallet-card overflow-hidden">
+      <div
+        class="wallet-card overflow-hidden bg-white dark:bg-gray-700 rounded-lg shadow-md"
+      >
         <DataTable
           :value="filteredTransactions"
           :paginator="true"
           :rows="10"
+          :rowsPerPageOptions="[5, 10, 20, 50]"
           responsive-layout="stack"
           :row-hover="true"
           class="p-datatable-sm"
           stripedRows
+          :loading="loading"
         >
-          <Column field="date" header="Date" :sortable="true">
+          <Column
+            field="date"
+            :header="t('pages.transactions.date')"
+            :sortable="true"
+          >
             <template #body="slotProps">
               {{ formatDate(slotProps.data.date) }}
             </template>
           </Column>
-          <Column field="category.name" header="Category" :sortable="true" />
-          <Column field="description" header="Description" />
-          <Column field="amount" header="Amount" :sortable="true">
+          <Column
+            field="category.name"
+            :header="t('pages.transactions.category')"
+            :sortable="true"
+          >
+            <template #body="slotProps">
+              <Tag
+                :value="slotProps.data.category.name"
+                :severity="getCategoryTagSeverity(slotProps.data.category)"
+              />
+            </template>
+          </Column>
+          <Column
+            field="description"
+            :header="t('pages.transactions.description')"
+          />
+          <Column
+            field="amount"
+            :header="t('pages.transactions.amount')"
+            :sortable="true"
+          >
             <template #body="slotProps">
               <span :class="getAmountColor(slotProps.data)">
                 {{ formatAmount(slotProps.data) }}
               </span>
             </template>
           </Column>
-          <Column header="Actions" :exportable="false">
+          <Column
+            :header="t('common.actions')"
+            :exportable="false"
+            style="width: 100px"
+          >
             <template #body="slotProps">
               <div class="flex space-x-2">
                 <Button
                   icon="pi pi-pencil"
                   @click="editTransaction(slotProps.data)"
                   class="p-button-text p-button-sm"
+                  v-tooltip="t('common.edit')"
                 />
                 <Button
                   icon="pi pi-trash"
                   @click="confirmDelete(slotProps.data)"
                   class="p-button-text p-button-sm p-button-danger"
+                  v-tooltip="t('common.delete')"
                 />
               </div>
             </template>
@@ -84,34 +123,44 @@
     <!-- New/Edit Transaction Modal -->
     <Dialog
       v-model:visible="transactionModalVisible"
-      :header="isEditing ? 'Edit Transaction' : 'New Transaction'"
+      :header="
+        isEditing
+          ? t('pages.transactions.editTransaction')
+          : t('pages.transactions.newTransaction')
+      "
       :modal="true"
       class="p-fluid"
     >
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="field">
-          <label for="date" class="font-medium">Date</label>
+          <label for="date" class="font-medium">{{
+            t('pages.transactions.date')
+          }}</label>
           <DatePicker
             id="date"
-            v-model="currentTransaction.date"
+            v-model="DateSelected"
             dateFormat="dd/mm/yy"
             class="w-full"
           />
         </div>
         <div class="field">
-          <label for="category" class="font-medium">Category</label>
+          <label for="category" class="font-medium">{{
+            t('pages.transactions.category')
+          }}</label>
           <Select
             id="category"
             v-model="currentTransaction.category_id"
             :options="categories"
             optionLabel="name"
             optionValue="id"
-            placeholder="Select Category"
+            :placeholder="t('pages.transactions.selectCategory')"
             class="w-full"
           />
         </div>
         <div class="field md:col-span-2">
-          <label for="description" class="font-medium">Description</label>
+          <label for="description" class="font-medium">{{
+            t('pages.transactions.description')
+          }}</label>
           <InputText
             id="description"
             v-model="currentTransaction.description"
@@ -119,7 +168,9 @@
           />
         </div>
         <div class="field md:col-span-2">
-          <label for="amount" class="font-medium">Amount</label>
+          <label for="amount" class="font-medium">{{
+            t('pages.transactions.amount')
+          }}</label>
           <InputNumber
             id="amount"
             v-model="currentTransaction.amount"
@@ -130,37 +181,39 @@
           />
         </div>
         <div class="field md:col-span-2">
-          <label for="isRecurring" class="font-medium">Is Recurring</label>
+          <label for="isRecurring" class="font-medium">{{
+            t('pages.transactions.isRecurring')
+          }}</label>
           <ToggleButton
             v-model="currentTransaction.is_recurring"
-            onLabel="Yes"
-            offLabel="No"
+            :onLabel="t('common.yes')"
+            :offLabel="t('common.no')"
           />
         </div>
         <div v-if="currentTransaction.is_recurring" class="field md:col-span-2">
-          <label for="recurrenceFrequency" class="font-medium"
-            >Recurrence Frequency</label
-          >
+          <label for="recurrenceFrequency" class="font-medium">{{
+            t('pages.transactions.recurrenceFrequency')
+          }}</label>
           <Select
             id="recurrenceFrequency"
             v-model="currentTransaction.recurrence_frequency_id"
             :options="recurrenceFrequencies"
             optionLabel="name"
             optionValue="id"
-            placeholder="Select Frequency"
+            :placeholder="t('pages.transactions.selectFrequency')"
             class="w-full"
           />
         </div>
       </div>
       <template #footer>
         <Button
-          label="Cancel"
+          :label="t('common.cancel')"
           icon="pi pi-times"
           @click="closeTransactionModal"
           class="p-button-text"
         />
         <Button
-          label="Save"
+          :label="t('common.save')"
           icon="pi pi-check"
           @click="saveTransaction"
           class="wallet-btn-primary"
@@ -175,16 +228,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { useAuthStore } from '@/stores/authStore'
 import { formatDate, formatAmount } from '@/utils/utils'
-import { calculateDateRange } from '@/utils/date'
+import { calculateDateRange, formatDateForAPI } from '@/utils/date'
 import { Transaction } from '@/types/transaction'
 import { Category } from '@/types/category'
 import { useConfirm } from 'primevue/useconfirm'
-import { useToast } from 'primevue/usetoast'
+import { getAmountColor, getCategoryTagSeverity } from '@/utils/colors'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 
@@ -193,21 +246,35 @@ const categoryStore = useCategoryStore()
 const authStore = useAuthStore()
 
 const confirm = useConfirm()
-const toast = useToast()
-const { t } = useI18n()
 
+const { t } = useI18n()
 const { appUser } = storeToRefs(authStore)
+
+import { useToastManager } from '@/utils/toastManager'
+const toastManager = useToastManager()
 
 const dateRange = ref<Date[]>([])
 const selectedCategory = ref<Category | null>(null)
 const transactionModalVisible = ref(false)
 const isEditing = ref(false)
 const currentTransaction = ref<Partial<Transaction>>({})
+const loading = ref(true)
 
 const categories = computed(() => categoryStore.categories)
 const recurrenceFrequencies = computed(
   () => transactionStore.recurrenceFrequencies
 )
+
+const DateSelected = ref<Date>(new Date())
+
+const categoryOptions = computed(() => [
+  { name: t('pages.transactions.allCategories'), id: null },
+  ...categories.value,
+])
+
+watch(DateSelected, (newDate) => {
+  currentTransaction.value.date = formatDateForAPI(newDate)
+})
 
 const filteredTransactions = computed(() => {
   let filtered = transactionStore.transactions
@@ -220,7 +287,7 @@ const filteredTransactions = computed(() => {
     )
   }
 
-  if (selectedCategory.value) {
+  if (selectedCategory.value && selectedCategory.value.id !== null) {
     filtered = filtered.filter(
       (t) => t.category_id === selectedCategory.value?.id
     )
@@ -235,27 +302,41 @@ onMounted(async () => {
       appUser.value?.start_month || 1
     )
     dateRange.value = [startDate, endDate]
-    await Promise.all([
-      categoryStore.fetchUserCategories(authStore.user.id),
-      transactionStore.fetchUserTransactions(
-        authStore.user.id,
-        startDate.toISOString().split('T')[0],
-        endDate.toISOString().split('T')[0]
-      ),
-      transactionStore.fetchRecurrenceFrequencies(),
-    ])
+    await fetchData()
   }
 })
 
+async function fetchData() {
+  loading.value = true
+  try {
+    if (appUser.value) {
+      await Promise.all([
+        categoryStore.fetchUserCategories(appUser.value.id),
+        fetchTransactions(),
+        transactionStore.fetchRecurrenceFrequencies(),
+      ])
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    toastManager.showError(t('pages.transactions.fetchError'))
+  } finally {
+    loading.value = false
+  }
+}
+
 function openNewTransactionModal() {
   isEditing.value = false
-  currentTransaction.value = { date: new Date(), is_recurring: false }
+  currentTransaction.value = {
+    date: formatDateForAPI(new Date()),
+    is_recurring: false,
+  }
   transactionModalVisible.value = true
 }
 
 function editTransaction(transaction: Transaction) {
   isEditing.value = true
   currentTransaction.value = { ...transaction }
+  DateSelected.value = new Date(transaction.date)
   transactionModalVisible.value = true
 }
 
@@ -271,41 +352,26 @@ async function saveTransaction() {
         currentTransaction.value.id!,
         currentTransaction.value
       )
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Transaction updated successfully',
-        life: 3000,
-      })
+      toastManager.showSuccess(t('pages.transactions.updateSuccess'))
     } else {
       await transactionStore.createTransaction({
         ...currentTransaction.value,
         user_id: appUser.value?.id,
       })
-      toast.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Transaction created successfully',
-        life: 3000,
-      })
+      toastManager.showSuccess(t('pages.transactions.createSuccess'))
     }
     closeTransactionModal()
     await fetchTransactions()
   } catch (error) {
     console.error('Error saving transaction:', error)
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'An error occurred while saving the transaction',
-      life: 3000,
-    })
+    toastManager.showError(t('pages.transactions.saveError'))
   }
 }
 
 function confirmDelete(transaction: Transaction) {
   confirm.require({
-    message: 'Are you sure you want to delete this transaction?',
-    header: 'Confirmation',
+    message: t('pages.transactions.deleteConfirm'),
+    header: t('common.confirmDelete'),
     icon: 'pi pi-exclamation-triangle',
     acceptClass: 'p-button-danger',
     accept: () => deleteTransaction(transaction.id),
@@ -315,21 +381,11 @@ function confirmDelete(transaction: Transaction) {
 async function deleteTransaction(id: string) {
   try {
     await transactionStore.deleteTransaction(id)
-    toast.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Transaction deleted successfully',
-      life: 3000,
-    })
+    toastManager.showSuccess(t('pages.transactions.deleteSuccess'))
     await fetchTransactions()
   } catch (error) {
     console.error('Error deleting transaction:', error)
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'An error occurred while deleting the transaction',
-      life: 3000,
-    })
+    toastManager.showError(t('pages.transactions.deleteError'))
   }
 }
 
@@ -339,22 +395,8 @@ async function fetchTransactions() {
   const [startDate, endDate] = dateRange.value
   await transactionStore.fetchUserTransactions(
     appUser.value.id,
-    startDate.toISOString().split('T')[0],
-    endDate.toISOString().split('T')[0]
+    formatDateForAPI(startDate),
+    formatDateForAPI(endDate)
   )
-}
-
-function getAmountColor(transaction: Transaction): string {
-  if (!transaction.category?.type) return ''
-  const categoryTypeName = transaction.category.type.name
-  if (categoryTypeName === 'income') {
-    return 'text-green-500 dark:text-green-400'
-  } else if (
-    categoryTypeName === 'necessary_expense' ||
-    categoryTypeName === 'optional_expense'
-  ) {
-    return 'text-red-500 dark:text-red-400'
-  }
-  return ''
 }
 </script>

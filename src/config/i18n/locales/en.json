@@ -12,9 +12,19 @@
     "confirmDelete": "Confirm Delete",
     "success": "Success",
     "error": "Error",
+    "info": "Info",
+    "warning": "Warning",
     "search": "Search",
     "delete": "Delete",
+    "yes": "Yes",
+    "no": "No",
     "edit": "Edit"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "numeric": "Please enter a valid number",
+    "date": "Please enter a valid date"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -67,6 +77,8 @@
       "saveError": "Error saving category",
       "deleteError": "Error deleting category",
       "selectType": "Select Type",
+      "filterByType": "Filter by Type",
+      "allTypes": "All Types",
       "categoryTypes": {
         "income": "Income",
         "necessary_expense": "Necessary Expense",
@@ -99,6 +111,10 @@
       "totalIncome": "Total Income",
       "totalExpenses": "Total Expenses",
       "balance": "Balance",
+      "selectCategory": "Select Category",
+      "selectDateRange": "Select Date Range",
+      "allCategories": "All Categories",
+      "addTransaction": "Add Transaction",
       "isRecurring": "Is Recurring",
       "recurrenceFrequency": "Recurrence Frequency",
       "deleteConfirmation": "Are you sure you want to delete this transaction?",
@@ -106,7 +122,8 @@
       "updateSuccess": "Transaction updated successfully",
       "deleteSuccess": "Transaction deleted successfully",
       "errorOccurred": "An error occurred. Please try again.",
-      "newTransaction": "New Transaction"
+      "newTransaction": "New Transaction",
+      "descriptionPlaceholder": "Enter description (optional)"
     }
   }
 }

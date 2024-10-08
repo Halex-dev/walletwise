@@ -7,10 +7,10 @@
         <h1
           class="text-5xl font-bold text-primary-700 dark:text-primary-300 mb-4"
         >
-          {{ $t('appName') }}
+          {{ t('appName') }}
         </h1>
         <p class="text-xl text-gray-600 dark:text-gray-400">
-          {{ $t('pages.home.tagline') }}
+          {{ t('pages.home.tagline') }}
         </p>
       </header>
 
@@ -19,10 +19,10 @@
       >
         <div class="p-8">
           <h2 class="text-3xl font-semibold text-gray-800 dark:text-white mb-6">
-            {{ $t('pages.home.welcome') }}
+            {{ t('pages.home.welcome') }}
           </h2>
           <p class="text-gray-600 dark:text-gray-400 mb-6">
-            {{ $t('pages.home.description') }}
+            {{ t('pages.home.description') }}
           </p>
 
           <div class="grid md:grid-cols-2 gap-6 mb-8">
@@ -33,7 +33,7 @@
             >
               <i class="pi pi-check-circle text-green-500 mr-2 mt-1"></i>
               <span class="text-gray-700 dark:text-gray-300">{{
-                $t(`pages.home.features.${feature}`)
+                t(`pages.home.features.${feature}`)
               }}</span>
             </div>
           </div>
@@ -43,7 +43,7 @@
               @click="goToLogin"
               class="p-3 px-6 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg"
             >
-              {{ $t('pages.home.getStarted') }}
+              {{ t('pages.home.getStarted') }}
             </Button>
           </div>
 
@@ -52,14 +52,14 @@
           >
             <p class="text-yellow-700 dark:text-yellow-300">
               <i class="pi pi-info-circle mr-2"></i>
-              {{ $t('pages.home.developmentNotice') }}
+              {{ t('pages.home.developmentNotice') }}
             </p>
           </div>
         </div>
       </main>
 
       <footer class="text-center mt-12 text-gray-600 dark:text-gray-400">
-        <p>{{ $t('pages.home.footer') }}</p>
+        <p>{{ t('pages.home.footer') }}</p>
       </footer>
     </div>
   </div>

@@ -47,7 +47,7 @@
         <template #content>
           <TransitionGroup name="list" tag="div">
             <div
-              v-for="(category, index) in selectedBudgetRule.categories"
+              v-for="category in selectedBudgetRule.categories"
               :key="category.name"
               class="mb-6"
             >

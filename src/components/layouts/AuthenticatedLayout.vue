@@ -5,7 +5,7 @@
     <!-- Sidebar -->
     <aside
       :class="[
-        'bg-primary-700 text-white transition-all duration-300 ease-in-out',
+        'bg-primary-900 text-white transition-all duration-300 ease-in-out',
         isSidebarCollapsed ? 'w-20' : 'w-64',
       ]"
     >
@@ -74,7 +74,7 @@
                   isDark ? $t('common.lightMode') : $t('common.darkMode')
                 "
               />
-              <Dropdown
+              <Select
                 v-model="selectedLocale"
                 :options="localeOptions"
                 optionLabel="name"
@@ -162,18 +162,18 @@ const logout = async () => {
   try {
     await authStore.logout()
     router.push('/login')
-    toastManager.showSuccess(t('common.logoutSuccess'))
+    toastManager.showSuccess('common.logoutSuccess')
   } catch (error) {
     console.error('Logout error:', error)
-    toastManager.showError(t('common.logoutError'))
+    toastManager.showError('common.logoutError')
   }
 }
 
 // Watch for locale changes
 watch(selectedLocale, (newLocale) => {
   locale.value = newLocale
+  toastManager.showInfo('common.languageChanged')
   localStorage.setItem('locale', newLocale)
-  toastManager.showInfo(t('common.languageChanged'))
 })
 </script>
 

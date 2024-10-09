@@ -4,6 +4,7 @@
       {{ $t('pages.categories.title') }}
     </h1>
 
+    <!-- Filters -->
     <div
       class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
     >
@@ -14,14 +15,14 @@
         class="p-button-primary w-full sm:w-auto transition-colors duration-200 hover:bg-primary-600"
       />
       <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-        <span class="p-input-icon-left w-full sm:w-64">
-          <i class="pi pi-search" />
+        <IconField>
+          <InputIcon class="pi pi-search" />
           <InputText
             v-model="searchQuery"
             :placeholder="$t('common.search')"
             class="w-full"
           />
-        </span>
+        </IconField>
         <Select
           v-model="selectedType"
           :options="categoryTypeOptions"
@@ -42,6 +43,7 @@
       </div>
     </div>
 
+    <!-- Transition -->
     <TransitionGroup
       name="list"
       tag="div"

@@ -10,6 +10,18 @@ import {
   isValid,
 } from 'date-fns'
 
+export const getDateFormatForLocale = (locale: string) => {
+  switch (locale) {
+    case 'en':
+      return 'mm/dd/yy'
+    case 'it':
+      return 'dd/mm/yy'
+    // Aggiungi altri casi per le lingue supportate
+    default:
+      return 'dd/mm/yy'
+  }
+}
+
 export function calculateDateRange(startMonth: number): [Date, Date] {
   const now = new Date()
   const currentYear = now.getFullYear()

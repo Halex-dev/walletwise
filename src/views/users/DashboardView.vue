@@ -31,12 +31,12 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
       <!-- Budget Rules -->
       <Card class="shadow-lg">
-        <template #header>
+        <template #title>
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-semibold">
               {{ $t('pages.dashboard.budgetRules') }}
             </h2>
-            <Dropdown
+            <Select
               v-model="selectedBudgetRule"
               :options="budgetRules"
               optionLabel="name"
@@ -77,7 +77,7 @@
 
       <!-- Income vs Expenses Chart -->
       <Card class="shadow-lg">
-        <template #header>
+        <template #title>
           <h2 class="text-xl font-semibold">
             {{ $t('pages.dashboard.incomeVsExpenses') }}
           </h2>
@@ -97,7 +97,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
       <!-- Expenses by Category Chart -->
       <Card class="shadow-lg">
-        <template #header>
+        <template #title>
           <h2 class="text-xl font-semibold">
             {{ $t('pages.dashboard.expensesByCategory') }}
           </h2>
@@ -114,7 +114,7 @@
 
       <!-- Recent Transactions -->
       <Card class="shadow-lg">
-        <template #header>
+        <template #title>
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-semibold">
               {{ $t('pages.dashboard.recentTransactions') }}

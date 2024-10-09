@@ -13,7 +13,7 @@
       <template #content>
         <div class="text-center">
           <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-white">
-            {{ $t('auth.completingLogin') }}
+            {{ $t('pages.auth.completingLogin') }}
           </h2>
 
           <div v-if="loading" class="mb-6">
@@ -31,10 +31,10 @@
           <div v-if="success" class="mb-6">
             <i class="pi pi-check-circle text-5xl text-green-500 mb-4"></i>
             <p class="text-lg text-gray-800 dark:text-white">
-              {{ $t('auth.loginSuccessful') }}
+              {{ $t('pages.auth.loginSuccessful') }}
             </p>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
-              {{ $t('auth.redirecting') }}
+              {{ $t('pages.auth.redirecting') }}
             </p>
           </div>
 
@@ -44,7 +44,7 @@
                 <i class="pi pi-times-circle text-4xl mb-2"></i>
                 <p>{{ error }}</p>
                 <Button @click="retryLogin" class="mt-4 p-button-outlined">
-                  {{ $t('auth.retryLogin') }}
+                  {{ $t('pages.auth.retryLogin') }}
                 </Button>
               </div>
             </template>
@@ -72,12 +72,12 @@ const authStore = useAuthStore()
 const loading = ref(true)
 const error = ref('')
 const success = ref(false)
-const loadingMessage = ref(t('auth.verifyingCredentials'))
+const loadingMessage = ref(t('pages.auth.verifyingCredentials'))
 
 const loadingMessages = [
-  t('auth.verifyingCredentials'),
-  t('auth.settingUpAccount'),
-  t('auth.almostThere'),
+  t('pages.auth.verifyingCredentials'),
+  t('pages.auth.settingUpAccount'),
+  t('pages.auth.almostThere'),
 ]
 
 let messageIndex = 0
@@ -97,7 +97,7 @@ onMounted(async () => {
   } catch (err) {
     console.error('Auth callback failed:', err)
     loading.value = false
-    error.value = t('auth.loginFailed')
+    error.value = t('pages.auth.loginFailed')
   } finally {
     clearInterval(messageInterval)
   }

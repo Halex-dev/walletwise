@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="transactions-page min-h-screen p-4 md:p-6 lg:p-8 bg-gray-50 dark:bg-gray-800"
-  >
+  <div class="transactions-page min-h-screen p-4 md:p-6 lg:p-8">
     <div class="max-w-7xl mx-auto">
       <h1
         class="text-3xl md:text-4xl font-bold mb-8 text-gray-800 dark:text-white"
@@ -24,7 +22,9 @@
               selectionMode="range"
               :manualInput="false"
               class="w-full sm:w-64"
+              :dateFormat="dateFormat"
               :placeholder="t('pages.transactions.selectDateRange')"
+              @update:modelValue="fetchTransactions"
             />
             <Select
               v-model="selectedCategory"
@@ -290,7 +290,11 @@ import { useTransactionStore } from '@/stores/transactionStore'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { useAuthStore } from '@/stores/authStore'
 import { formatDate, formatAmount } from '@/utils/utils'
-import { calculateDateRange, formatDateForAPI } from '@/utils/date'
+import {
+  calculateDateRange,
+  formatDateForAPI,
+  getDateFormatForLocale,
+} from '@/utils/date'
 import { Transaction } from '@/types/transaction'
 import { Category } from '@/types/category'
 import { useConfirm } from 'primevue/useconfirm'
@@ -306,11 +310,13 @@ const authStore = useAuthStore()
 
 const confirm = useConfirm()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { appUser } = storeToRefs(authStore)
 
 import { useToastManager } from '@/utils/toastManager'
 const toastManager = useToastManager()
+
+const dateFormat = computed(() => getDateFormatForLocale(locale.value))
 
 const dateRange = ref<Date[]>([])
 const selectedCategory = ref<Category | null>(null)
@@ -355,16 +361,10 @@ watch(DateSelected, (newDate) => {
   currentTransaction.value.date = formatDateForAPI(newDate)
 })
 
-const filteredTransactions = computed(() => {
-  let filtered = transactionStore.transactions
+const transactions = computed(() => transactionStore.transactions)
 
-  if (dateRange.value.length === 2) {
-    filtered = filtered.filter(
-      (t) =>
-        new Date(t.date) >= dateRange.value[0] &&
-        new Date(t.date) <= dateRange.value[1]
-    )
-  }
+const filteredTransactions = computed(() => {
+  let filtered = transactions.value
 
   if (selectedCategory.value && selectedCategory.value.id !== null) {
     filtered = filtered.filter(
@@ -397,7 +397,7 @@ async function fetchData() {
     }
   } catch (error) {
     console.error('Error fetching data:', error)
-    toastManager.showError(t('pages.transactions.fetchError'))
+    toastManager.showError('pages.transactions.fetchError')
   } finally {
     loading.value = false
   }
@@ -435,7 +435,7 @@ function closeTransactionModal() {
 async function saveTransaction() {
   v$.value.$touch()
   if (v$.value.$invalid) {
-    toastManager.showError(t('validation.fixErrors'))
+    toastManager.showError('validation.fixErrors')
     return
   }
 
@@ -445,20 +445,20 @@ async function saveTransaction() {
         currentTransaction.value.id!,
         currentTransaction.value
       )
-      toastManager.showSuccess(t('pages.transactions.updateSuccess'))
+      toastManager.showSuccess('pages.transactions.updateSuccess')
     } else {
       await transactionStore.createTransaction({
         ...currentTransaction.value,
         user_id: appUser.value?.id,
         date: formatDateForAPI(DateSelected.value), // Assicurati di usare la data selezionata
       })
-      toastManager.showSuccess(t('pages.transactions.createSuccess'))
+      toastManager.showSuccess('pages.transactions.createSuccess')
     }
     closeTransactionModal()
     await fetchTransactions()
   } catch (error) {
     console.error('Error saving transaction:', error)
-    toastManager.showError(t('pages.transactions.saveError'))
+    toastManager.showError('pages.transactions.saveError')
   }
 }
 
@@ -475,11 +475,11 @@ function confirmDelete(transaction: Transaction) {
 async function deleteTransaction(id: string) {
   try {
     await transactionStore.deleteTransaction(id)
-    toastManager.showSuccess(t('pages.transactions.deleteSuccess'))
+    toastManager.showSuccess('pages.transactions.deleteSuccess')
     await fetchTransactions()
   } catch (error) {
     console.error('Error deleting transaction:', error)
-    toastManager.showError(t('pages.transactions.deleteError'))
+    toastManager.showError('pages.transactions.deleteError')
   }
 }
 
@@ -487,6 +487,9 @@ async function fetchTransactions() {
   if (!appUser.value) return
 
   const [startDate, endDate] = dateRange.value
+
+  if (!startDate || !endDate) return
+
   await transactionStore.fetchUserTransactions(
     appUser.value.id,
     formatDateForAPI(startDate),

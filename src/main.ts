@@ -9,7 +9,7 @@ import router from './router'
 
 // PrimeVue
 import PrimeVue from 'primevue/config'
-import Aura from '@primevue/themes/aura'
+import { MyPreset } from '@/components/theme/myTheme'
 import i18n from './config/i18n'
 import ToastService from 'primevue/toastservice'
 import ConfirmationService from 'primevue/confirmationservice'
@@ -23,7 +23,7 @@ const app = createApp(App)
 
 app.use(PrimeVue, {
   theme: {
-    preset: Aura,
+    preset: MyPreset,
     options: {
       cssLayer: {
         name: 'primevue',

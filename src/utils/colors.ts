@@ -16,6 +16,13 @@ export function getAmountColor(transaction: Transaction): string {
   }
 }
 
+export const getBudgetStatusClass = (category: any) => {
+  const ratio = category.spent / category.limit
+  if (ratio > 1) return 'text-red-600'
+  if (ratio > 0.9) return 'text-yellow-600'
+  return 'text-green-600'
+}
+
 export function getCategoryTagSeverity(category?: Category): string {
   const typeName = category?.type?.name
   const severityMap: Record<string, string> = {

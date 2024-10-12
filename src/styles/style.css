@@ -8,3 +8,34 @@
   @tailwind components;
   @tailwind utilities;
 }
+
+.custom-secondary-button {
+  background-color: #ffe7bf !important; /* Arancione molto chiaro */
+  color: #ff7821 !important; /* Arancione scuro per il testo */
+  border: 1px solid #ffd597 !important; /* Bordo arancione chiaro */
+}
+
+.custom-secondary-button:hover {
+  background-color: #ffd597 !important; /* Arancione chiaro per hover */
+  border-color: #ffc36d !important; /* Bordo leggermente più scuro per hover */
+}
+
+.custom-secondary-button:focus {
+  box-shadow: 0 0 0 2px #fff8e5 !important; /* Ombra molto chiara per focus */
+}
+
+/* Stili per il tema scuro */
+:global(.dark) .custom-secondary-button {
+  background-color: #ff7821 !important; /* Arancione scuro per sfondo in tema scuro */
+  color: #fff8e5 !important; /* Testo molto chiaro per contrasto */
+  border-color: #ff892b !important; /* Bordo leggermente più chiaro */
+}
+
+:global(.dark) .custom-secondary-button:hover {
+  background-color: #ff892b !important; /* Arancione leggermente più chiaro per hover */
+  border-color: #ffc36d !important; /* Bordo più chiaro per hover */
+}
+
+:global(.dark) .custom-secondary-button:focus {
+  box-shadow: 0 0 0 2px #ff610e !important; /* Ombra arancione intenso per focus */
+}

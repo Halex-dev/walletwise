@@ -1,30 +1,21 @@
 import type { Transaction } from '@/types/transaction'
-
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('it-IT', {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(amount)
-}
+import { formatCurrencyForCurrentUser } from './users'
 
 export function formatAmount(transaction: Transaction): string {
-  if (!transaction.category?.type) return formatCurrency(transaction.amount)
+  if (!transaction.category?.type)
+    return formatCurrencyForCurrentUser(transaction.amount)
   const categoryTypeName = transaction.category.type.name
 
   if (categoryTypeName === 'income') {
-    return '+ ' + formatCurrency(transaction.amount)
+    return '+ ' + formatCurrencyForCurrentUser(transaction.amount)
   } else if (
     categoryTypeName === 'short_term_investment' ||
     categoryTypeName === 'long_term_investment'
   ) {
-    return formatCurrency(transaction.amount)
+    return formatCurrencyForCurrentUser(transaction.amount)
   } else {
-    return '- ' + formatCurrency(transaction.amount)
+    return '- ' + formatCurrencyForCurrentUser(transaction.amount)
   }
-}
-
-export function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString()
 }
 
 export const roundToTwoDecimals = (value: number) => {

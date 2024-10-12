@@ -18,7 +18,7 @@
                 {{ $t(summary.label) }}
               </h3>
               <p :class="['text-2xl font-bold', summary.colorClass]">
-                {{ formatCurrency(summary.value) }}
+                {{ formatCurrencyForCurrentUser(summary.value) }}
               </p>
             </div>
             <i :class="[summary.icon, 'text-4xl', summary.iconColorClass]"></i>
@@ -54,8 +54,8 @@
               <div class="flex justify-between mb-2">
                 <span class="font-semibold">{{ category.name }}</span>
                 <span :class="getBudgetStatusClass(category)">
-                  {{ formatCurrency(category.spent) }} /
-                  {{ formatCurrency(category.limit) }}
+                  {{ formatCurrencyForCurrentUser(category.spent) }} /
+                  {{ formatCurrencyForCurrentUser(category.limit) }}
                 </span>
               </div>
               <ProgressBar
@@ -160,8 +160,8 @@
               sortable
             >
               <template #body="slotProps">
-                <span :class="getAmountClass(slotProps.data)">
-                  {{ formatCurrency(slotProps.data.amount) }}
+                <span :class="getAmountColor(slotProps.data)">
+                  {{ formatCurrencyForCurrentUser(slotProps.data.amount) }}
                 </span>
               </template>
             </Column>
@@ -171,7 +171,7 @@
               sortable
             >
               <template #body="slotProps">
-                {{ formatDate(slotProps.data.date) }}
+                {{ formatDateForUser(slotProps.data.date, appUser) }}
               </template>
             </Column>
           </DataTable>
@@ -188,14 +188,15 @@ import { useRouter } from 'vue-router'
 import { useTransactionStore } from '@/stores/transactionStore'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
-import {
-  formatCurrency,
-  formatDate,
-  formatPercentage,
-  calculatePercentage,
-} from '@/utils/utils'
+import { formatPercentage, calculatePercentage } from '@/utils/utils'
 import { calculateDateRange, formatDateForAPI } from '@/utils/date'
-import { getCategoryTagSeverity } from '@/utils/colors'
+import {
+  getCategoryTagSeverity,
+  getAmountColor,
+  getBudgetStatusClass,
+} from '@/utils/colors'
+import { formatDateForUser } from '@/utils/users'
+import { formatCurrencyForCurrentUser } from '@/utils/users'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -240,7 +241,11 @@ const financialSummary = computed(() => [
   },
   {
     label: 'pages.dashboard.totalSavings',
-    value: totalIncome.value - totalExpenses.value,
+    value:
+      totalIncome.value -
+      totalExpenses.value -
+      totalShortInvestment.value -
+      totalLongInvestment.value,
     colorClass: 'text-purple-600',
     iconColorClass: 'text-purple-400',
     icon: 'pi pi-wallet',
@@ -349,19 +354,6 @@ const doughnutChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: { legend: { position: 'right' } },
-}
-
-const getAmountClass = (transaction: any) => {
-  return transaction.category?.type?.name === 'income'
-    ? 'text-green-600'
-    : 'text-red-600'
-}
-
-const getBudgetStatusClass = (category: any) => {
-  const ratio = category.spent / category.limit
-  if (ratio > 1) return 'text-red-600'
-  if (ratio > 0.9) return 'text-yellow-600'
-  return 'text-green-600'
 }
 
 async function fetchTransactions() {

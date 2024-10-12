@@ -22,7 +22,7 @@
               selectionMode="range"
               :manualInput="false"
               class="w-full sm:w-64"
-              :dateFormat="dateFormat"
+              :dateFormat="getDateFormatForUser(appUser)"
               :placeholder="t('pages.transactions.selectDateRange')"
               @update:modelValue="fetchTransactions"
             />
@@ -64,7 +64,7 @@
             :sortable="true"
           >
             <template #body="slotProps">
-              {{ formatDate(slotProps.data.date) }}
+              {{ formatDateForUser(slotProps.data.date, appUser) }}
             </template>
           </Column>
           <Column
@@ -139,7 +139,7 @@
           <DatePicker
             id="date"
             v-model="DateSelected"
-            dateFormat="dd/mm/yy"
+            :dateFormat="getDateFormatForUser(appUser)"
             class="w-full"
             :class="{
               'p-invalid': v$.DateSelected.$invalid && v$.DateSelected.$dirty,
@@ -289,16 +289,14 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useTransactionStore } from '@/stores/transactionStore'
 import { useCategoryStore } from '@/stores/categoryStore'
 import { useAuthStore } from '@/stores/authStore'
-import { formatDate, formatAmount } from '@/utils/utils'
-import {
-  calculateDateRange,
-  formatDateForAPI,
-  getDateFormatForLocale,
-} from '@/utils/date'
+import { formatAmount } from '@/utils/utils'
+import { calculateDateRange, formatDateForAPI } from '@/utils/date'
 import { Transaction } from '@/types/transaction'
 import { Category } from '@/types/category'
 import { useConfirm } from 'primevue/useconfirm'
 import { getAmountColor, getCategoryTagSeverity } from '@/utils/colors'
+import { getDateFormatForUser, formatDateForUser } from '@/utils/users'
+
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { useVuelidate } from '@vuelidate/core'
@@ -310,13 +308,11 @@ const authStore = useAuthStore()
 
 const confirm = useConfirm()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { appUser } = storeToRefs(authStore)
 
 import { useToastManager } from '@/utils/toastManager'
 const toastManager = useToastManager()
-
-const dateFormat = computed(() => getDateFormatForLocale(locale.value))
 
 const dateRange = ref<Date[]>([])
 const selectedCategory = ref<Category | null>(null)

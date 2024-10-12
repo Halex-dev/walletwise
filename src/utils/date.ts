@@ -10,18 +10,6 @@ import {
   isValid,
 } from 'date-fns'
 
-export const getDateFormatForLocale = (locale: string) => {
-  switch (locale) {
-    case 'en':
-      return 'mm/dd/yy'
-    case 'it':
-      return 'dd/mm/yy'
-    // Aggiungi altri casi per le lingue supportate
-    default:
-      return 'dd/mm/yy'
-  }
-}
-
 export function calculateDateRange(startMonth: number): [Date, Date] {
   const now = new Date()
   const currentYear = now.getFullYear()
@@ -57,11 +45,6 @@ export function formatDateForAPI(date: Date | string): string {
 
   // Formatta la data nel formato richiesto da Supabase (YYYY-MM-DD)
   return format(dateObject, 'yyyy-MM-dd')
-}
-
-export function formatDateForDisplay(date: string | Date): string {
-  const parsedDate = typeof date === 'string' ? parseISO(date) : date
-  return format(parsedDate, 'dd/MM/yyyy')
 }
 
 export function isDateInRange(

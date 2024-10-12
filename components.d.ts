@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AssetCard: typeof import('./src/components/common/AssetCard.vue')['default']
     AuthenticatedLayout: typeof import('./src/components/layouts/AuthenticatedLayout.vue')['default']
     Button: typeof import('primevue/button')['default']
     Card: typeof import('primevue/card')['default']
@@ -20,8 +21,10 @@ declare module 'vue' {
     IconField: typeof import('primevue/iconfield')['default']
     InputIcon: typeof import('primevue/inputicon')['default']
     InputNumber: typeof import('primevue/inputnumber')['default']
+    InputSwitch: typeof import('primevue/inputswitch')['default']
     InputText: typeof import('primevue/inputtext')['default']
     Menu: typeof import('primevue/menu')['default']
+    MonthYearPicker: typeof import('./src/components/common/MonthYearPicker.vue')['default']
     ProgressBar: typeof import('primevue/progressbar')['default']
     PublicLayout: typeof import('./src/components/layouts/PublicLayout.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
@@ -31,6 +34,7 @@ declare module 'vue' {
     Tag: typeof import('primevue/tag')['default']
     Toast: typeof import('primevue/toast')['default']
     ToggleButton: typeof import('primevue/togglebutton')['default']
+    ToggleSwitch: typeof import('primevue/toggleswitch')['default']
   }
   export interface ComponentCustomProperties {
     Tooltip: typeof import('primevue/tooltip')['default']

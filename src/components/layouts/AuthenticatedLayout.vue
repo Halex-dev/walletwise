@@ -66,22 +66,6 @@
             </div>
             <div class="flex items-center space-x-4">
               <Button
-                @click="toggleTheme"
-                :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
-                class="p-button-rounded p-button-text"
-                :class="isDark ? 'text-yellow-400' : 'text-surface-600'"
-                v-tooltip.bottom="
-                  isDark ? $t('common.lightMode') : $t('common.darkMode')
-                "
-              />
-              <Select
-                v-model="selectedLocale"
-                :options="localeOptions"
-                optionLabel="name"
-                optionValue="code"
-                class="w-32"
-              />
-              <Button
                 @click="logout"
                 icon="pi pi-sign-out"
                 class="p-button-rounded p-button-danger p-button-text"
@@ -109,29 +93,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, provide } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
-import { useTheme } from '@/composables/useThemes'
+
+/*
+              <Button
+                @click="toggleTheme"
+                :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
+                class="p-button-rounded p-button-text"
+                :class="isDark ? 'text-yellow-400' : 'text-surface-600'"
+                v-tooltip.bottom="
+                  isDark ? $t('common.lightMode') : $t('common.darkMode')
+                "
+              />
+*/
+//const { isDark, toggleTheme } = useTheme()
 
 const { t, locale } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
-const { isDark, toggleTheme } = useTheme()
 
 import { useToastManager } from '@/utils/toastManager'
 const toastManager = useToastManager()
 
-const selectedLocale = ref(localStorage.getItem('locale') || 'en')
 const isSidebarCollapsed = ref(
   localStorage.getItem('sidebarCollapsed') === 'true'
 )
 
-const localeOptions = [
-  { name: 'English', code: 'en' },
-  { name: 'Italiano', code: 'it' },
-]
+const updateLanguage = (newLanguage: string) => {
+  locale.value = newLanguage
+}
+
+defineExpose({ updateLanguage })
+provide('updateLanguage', updateLanguage)
 
 const menuItems = computed(() => [
   { label: t('nav.dashboard'), icon: 'pi-home', to: '/user/' },
@@ -144,6 +140,11 @@ const menuItems = computed(() => [
     label: t('nav.categories'),
     icon: 'pi-chart-line',
     to: '/user/categories',
+  },
+  {
+    label: t('nav.portfolio'),
+    icon: 'pi-wallet',
+    to: '/user/portfolio',
   },
   { label: t('nav.settings'), icon: 'pi-cog', to: '/user/settings' },
 ])
@@ -168,13 +169,6 @@ const logout = async () => {
     toastManager.showError('common.logoutError')
   }
 }
-
-// Watch for locale changes
-watch(selectedLocale, (newLocale) => {
-  locale.value = newLocale
-  toastManager.showInfo('common.languageChanged')
-  localStorage.setItem('locale', newLocale)
-})
 </script>
 
 <style scoped>

@@ -20,6 +20,7 @@
     "yes": "Yes",
     "no": "No",
     "edit": "Edit",
+    "saveChanges": "Save Changes",
     "languageChanged": "Language changed",
     "logoutSuccess": "Logout successful"
   },
@@ -32,6 +33,7 @@
     "dashboard": "Dashboard",
     "transactions": "Transactions",
     "categories": "Categories",
+    "portfolio": "Portfolio",
     "settings": "Settings"
   },
   "pages": {
@@ -131,9 +133,35 @@
       "preferences": "Preferences",
       "startDay": "Start Day of Financial Month",
       "startDayDescription": "This determines which day of the month your financial period begins.",
-      "saveChanges": "Save Changes",
+      "currency": "Currency",
+      "dateView": "Date View",
+      "notify": "Notify",
+      "notifyDescription": "Receive notifications about new transactions.",
+      "notificationsDisabled": "Notifications Disabled",
+      "notificationsEnabled": "Notifications Enabled",
+      "saveSuccess": "Settings saved successfully",
+      "saveError": "Error saving settings",
+      "dateFormat": "Date Format",
+      "language": "Language",
       "days": {
         "day": "Day {day}"
+      }
+    },
+    "portfolio": {
+      "title": "Porfolio",
+      "month": {
+        "january": "Jan",
+        "february": "Feb",
+        "march": "Mar",
+        "april": "Apr",
+        "may": "May",
+        "june": "Jun",
+        "july": "Jul",
+        "august": "Aug",
+        "september": "Sept",
+        "october": "Oct",
+        "november": "Nov",
+        "december": "Dec"
       }
     },
     "transactions": {

@@ -65,6 +65,17 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
+  async function updateUser(id: string, updatedFields: Partial<AppUser>) {
+    try {
+      if (!appUser.value) {
+        throw new Error('Utente non trovato')
+      }
+
+      appUser.value = await userService.updateUser(id, updatedFields)
+    } catch (error) {
+      console.error('Errore nell aggiornamento dell utente:', error)
+    }
+  }
   return {
     user,
     appUser,
@@ -75,5 +86,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     checkAuth,
     onAuthStateChange,
+    updateUser,
   }
 })

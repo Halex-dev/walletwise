@@ -137,13 +137,16 @@ import { formatPercentageForUser } from '@/utils/users'
 import { formatCurrencyForCurrentUser } from '@/utils/users'
 import { storeToRefs } from 'pinia'
 import { getYear } from 'date-fns'
+import { useToastManager } from '@/utils/toastManager'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
 const portfolioStore = usePortfolioTrackerStore()
 
-const { totalsByCategory, monthlyTotals, portfolioTrackers } =
-  storeToRefs(portfolioStore)
+const toastManager = useToastManager()
+
+//totalsByCategory, monthlyTotals,
+const { portfolioTrackers } = storeToRefs(portfolioStore)
 const { appUser } = storeToRefs(authStore)
 
 onMounted(async () => {
@@ -231,7 +234,9 @@ function getChangeColor(change: number): string {
       : 'text-gray-500'
 }
 
-function addCategory() {}
+function addCategory() {
+  toastManager.showSuccess('pages.categories.createSuccess')
+}
 
 function removeCategory(_index: number) {}
 </script>

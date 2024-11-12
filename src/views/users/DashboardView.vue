@@ -4,6 +4,23 @@
       {{ $t('pages.dashboard.welcome') }} {{ appUser?.username }}
     </h1>
 
+    <!-- Month Navigation -->
+    <div class="flex justify-between items-center mb-8">
+      <Button
+        icon="pi pi-chevron-left"
+        class="p-button-text"
+        @click="prevMonth"
+      />
+      <h2 class="text-xl font-semibold">
+        {{ currentMonth }}
+      </h2>
+      <Button
+        icon="pi pi-chevron-right"
+        class="p-button-text"
+        @click="nextMonth"
+      />
+    </div>
+
     <!-- Financial Summary -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <Card
@@ -356,10 +373,18 @@ const doughnutChartOptions = {
   plugins: { legend: { position: 'right' } },
 }
 
+const currentDate = ref(new Date())
+const currentMonth = computed(() =>
+  currentDate.value.toLocaleString('default', {
+    month: 'long',
+    year: 'numeric',
+  })
+)
+
 async function fetchTransactions() {
   if (!appUser.value) return
 
-  const dateRange = calculateDateRange(appUser.value?.start_month || 1)
+  const dateRange = calculateDateRange(currentDate.value)
   await transactionStore.fetchUserTransactions(
     appUser.value.id,
     formatDateForAPI(dateRange[0]),
@@ -369,6 +394,16 @@ async function fetchTransactions() {
 
 function navigateToTransactions() {
   router.push({ name: 'transactions' })
+}
+
+function prevMonth() {
+  currentDate.value.setMonth(currentDate.value.getMonth() - 1)
+  fetchTransactions()
+}
+
+function nextMonth() {
+  currentDate.value.setMonth(currentDate.value.getMonth() + 1)
+  fetchTransactions()
 }
 
 onMounted(async () => {

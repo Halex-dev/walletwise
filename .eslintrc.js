@@ -17,6 +17,15 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'vue/multi-word-component-names': 'off', // Se preferisci non avere questa regola
+    'prettier/prettier': [
+      'warn',
+      {
+        semi: false,
+        singleQuote: true,
+        tabWidth: 2,
+        trailingComma: 'es5',
+      },
+    ],
   },
   settings: {
     'import/resolver': {

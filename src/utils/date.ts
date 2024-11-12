@@ -10,8 +10,14 @@ import {
   isValid,
 } from 'date-fns'
 
-export function calculateDateRange(startMonth: number): [Date, Date] {
-  const now = new Date()
+export function calculateDateRange(
+  startMonth: number,
+  date?: Date
+): [Date, Date] {
+  if (!date) {
+    date = new Date()
+  }
+  const now = new Date(date)
   const currentYear = now.getFullYear()
   const currentMonth = now.getMonth()
 

@@ -39,15 +39,13 @@
           </div>
 
           <Message v-if="error" severity="error" :closable="false" class="mt-4">
-            <template #content>
-              <div class="flex flex-col items-center">
-                <i class="pi pi-times-circle text-4xl mb-2"></i>
-                <p>{{ error }}</p>
-                <Button @click="retryLogin" class="mt-4 p-button-outlined">
-                  {{ $t('pages.auth.retryLogin') }}
-                </Button>
-              </div>
-            </template>
+            <div class="flex flex-col items-center">
+              <i class="pi pi-times-circle text-4xl mb-2"></i>
+              <p>{{ error }}</p>
+              <Button @click="retryLogin" class="mt-4 p-button-outlined">
+                {{ $t('pages.auth.retryLogin') }}
+              </Button>
+            </div>
           </Message>
         </div>
       </template>

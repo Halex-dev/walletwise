@@ -374,27 +374,12 @@ const doughnutChartOptions = {
 }
 
 const currentDate = ref(new Date())
-const currentMonth = computed(() =>
+const currentMonth = ref(
   currentDate.value.toLocaleString('default', {
     month: 'long',
     year: 'numeric',
   })
 )
-
-async function fetchTransactions() {
-  if (!appUser.value) return
-
-  const dateRange = calculateDateRange(currentDate.value)
-  await transactionStore.fetchUserTransactions(
-    appUser.value.id,
-    formatDateForAPI(dateRange[0]),
-    formatDateForAPI(dateRange[1])
-  )
-}
-
-function navigateToTransactions() {
-  router.push({ name: 'transactions' })
-}
 
 function prevMonth() {
   currentDate.value.setMonth(currentDate.value.getMonth() - 1)
@@ -404,6 +389,30 @@ function prevMonth() {
 function nextMonth() {
   currentDate.value.setMonth(currentDate.value.getMonth() + 1)
   fetchTransactions()
+}
+
+async function fetchTransactions() {
+  if (!appUser.value) return
+
+  const dateRange = calculateDateRange(
+    appUser.value?.start_month || 1,
+    currentDate.value
+  )
+
+  currentMonth.value = currentDate.value.toLocaleString('default', {
+    month: 'long',
+    year: 'numeric',
+  })
+
+  await transactionStore.fetchUserTransactions(
+    appUser.value.id,
+    formatDateForAPI(dateRange[0]),
+    formatDateForAPI(dateRange[1])
+  )
+}
+
+function navigateToTransactions() {
+  router.push({ name: 'transactions' })
 }
 
 onMounted(async () => {

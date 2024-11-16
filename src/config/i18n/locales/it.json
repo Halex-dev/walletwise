@@ -158,7 +158,6 @@
       "deleteSuccess": "Transazione eliminata con successo",
       "deleteConfirm": "Sei sicuro di voler eliminare questa transazione?",
       "errorOccurred": "Si è verificato un errore. Per favore riprova.",
-      "newTransaction": "Nuova Transazione",
       "descriptionPlaceholder": "Inserisci descrizione (opzionale)"
     }
   }

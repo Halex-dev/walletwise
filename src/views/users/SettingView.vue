@@ -234,10 +234,12 @@ const dayOptions = computed(() =>
     value: i + 1,
   }))
 )
+
 // Inject the updateLanguage function from the parent component
 const updateLanguage = inject('updateLanguage') as
   | UpdateLanguageFunction
   | undefined
+
 const originalLanguage = ref('')
 
 onMounted(async () => {
@@ -287,6 +289,7 @@ const saveChanges = async () => {
       if (language.value !== originalLanguage.value && updateLanguage) {
         updateLanguage(language.value)
         originalLanguage.value = language.value
+        appUser.value.language = language.value
       }
 
       toastManager.showSuccess('pages.settings.saveSuccess')

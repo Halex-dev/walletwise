@@ -99,10 +99,16 @@ export const useTransactionStore = defineStore('transaction', () => {
     }).map((date) => format(date, 'MMM yyyy'))
   })
 
-  const monthlyIncome = computed(() => calculateMonthlyData('income'))
-  const monthlyExpenses = computed(() =>
-    calculateMonthlyData(['necessary_expense', 'optional_expense'])
-  )
+  const monthlyIncome = computed(() => {
+    const tmp = calculateMonthlyData('income')
+    console.log(tmp)
+    return tmp
+  })
+  const monthlyExpenses = computed(() => {
+    const tmp = calculateMonthlyData(['necessary_expense', 'optional_expense'])
+    console.log(tmp)
+    return tmp
+  })
 
   function calculateMonthlyData(types: string | string[]) {
     const typeArray = Array.isArray(types) ? types : [types]

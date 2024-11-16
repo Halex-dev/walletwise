@@ -124,9 +124,7 @@
     <Dialog
       v-model:visible="transactionModalVisible"
       :header="
-        isEditing
-          ? t('pages.transactions.editTransaction')
-          : t('pages.transactions.newTransaction')
+        isEditing ? t('pages.transactions.edit') : t('pages.transactions.new')
       "
       :modal="true"
       class="p-fluid"

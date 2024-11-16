@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, provide } from 'vue'
+import { ref, computed, provide, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
@@ -114,8 +114,10 @@ import { useAuthStore } from '@/stores/authStore'
 const { t, locale } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
+const { appUser } = storeToRefs(authStore)
 
 import { useToastManager } from '@/utils/toastManager'
+import { storeToRefs } from 'pinia'
 const toastManager = useToastManager()
 
 const isSidebarCollapsed = ref(
@@ -125,6 +127,15 @@ const isSidebarCollapsed = ref(
 const updateLanguage = (newLanguage: string) => {
   locale.value = newLanguage
 }
+
+onMounted(async () => {
+  if (!appUser.value) {
+    await authStore.checkAuth()
+  }
+  if (appUser.value) {
+    updateLanguage(appUser.value.language)
+  }
+})
 
 defineExpose({ updateLanguage })
 provide('updateLanguage', updateLanguage)

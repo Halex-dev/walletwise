@@ -1,6 +1,6 @@
 # WalletWise 💰
 
-WalletWise is your personal finance companion, helping you track expenses and manage your budget effectively.
+WalletWise is your personal finance companion, helping you track expenses and manage your budget effectively. It'is a project that I am continuing in my spare time when I am not working or studying. It may be hae bugs or incomplete sections.
 
 ## 🌐 Live Demo
 
@@ -49,6 +49,7 @@ pnpm install
 pnpm dev
 ```
 
+Don't forget about the .env. If u don't know how to manage that, send me a DM on discord: Halex_
 ## 📱 Usage
 
 1. Log in with google

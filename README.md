@@ -1,6 +1,6 @@
 # WalletWise 💰
 
-WalletWise is your personal finance companion, helping you track expenses and manage your budget effectively. It'is a project that I am continuing in my spare time when I am not working or studying. It may be hae bugs or incomplete sections.
+WalletWise is your personal finance companion, helping you track expenses and manage your budget effectively. It's a project that I am continuing in my spare time when I am not working or studying. It may be have bugs or incomplete sections.
 
 ## 🌐 Live Demo
 

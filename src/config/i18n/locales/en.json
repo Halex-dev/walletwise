@@ -8,33 +8,38 @@
     "logout": "Logout",
     "cancel": "Cancel",
     "save": "Save",
+    "saveChanges": "Save Changes",
     "confirm": "Confirm",
     "actions": "Actions",
-    "confirmDelete": "Confirm Delete",
+    "confirmDelete": "Confirm Deletion",
     "success": "Success",
     "error": "Error",
-    "info": "Info",
+    "info": "Information",
     "warning": "Warning",
     "search": "Search",
     "delete": "Delete",
     "yes": "Yes",
     "no": "No",
     "edit": "Edit",
-    "saveChanges": "Save Changes",
-    "languageChanged": "Language changed",
-    "logoutSuccess": "Logout successful"
+    "languageChanged": "Language Changed",
+    "logoutSuccess": "Logout Successful"
   },
   "validation": {
-    "required": "Il campo {field} è obbligatorio",
-    "positive": "Il campo {field} deve essere maggiore di zero",
-    "fixErrors": "Per favore, correggi gli errori nel form prima di salvare"
+    "required": "The {field} field is required",
+    "positive": "The {field} field must be greater than zero",
+    "fixErrors": "Please fix the errors in the form before saving"
   },
   "nav": {
     "dashboard": "Dashboard",
     "transactions": "Transactions",
     "categories": "Categories",
-    "portfolio": "Portfolio",
-    "settings": "Settings"
+    "settings": "Settings",
+    "financialControl": "Financial Control",
+    "movements": "Movements",
+    "others": "Others",
+    "budget": "Budget",
+    "subscriptions": "Recurring Expenses",
+    "portfolio": "Portfolio"
   },
   "pages": {
     "home": {
@@ -47,8 +52,8 @@
         "insights": "Financial analysis and insights",
         "secure": "Secure and private"
       },
-      "getStarted": "Get Started",
-      "developmentNotice": "WalletWise is currently in active development. New features are being added regularly!",
+      "getStarted": "Get Started Now",
+      "developmentNotice": "WalletWise is currently under active development. New features are being added regularly!",
       "footer": "© 2024 WalletWise. All rights reserved."
     },
     "404": {
@@ -58,7 +63,7 @@
       "backToHome": "Back to Home",
       "goBack": "Go Back",
       "helpMessage": "Need help?",
-      "contactSupport": "Contact support"
+      "contactSupport": "Contact Support"
     },
     "auth": {
       "login": "Login",
@@ -74,15 +79,15 @@
       "loginSuccessful": "Login successful",
       "redirecting": "Redirecting to dashboard...",
       "loginFailed": "Login failed. Please try again.",
-      "retryLogin": "Retry login"
+      "retryLogin": "Retry Login"
     },
     "dashboard": {
       "title": "Dashboard",
       "welcome": "Welcome back,",
       "totalIncome": "Total Income",
       "totalExpenses": "Total Expenses",
-      "shortTermInvestments": "Short-term Investments",
-      "longTermInvestments": "Long-term Investments",
+      "shortTermInvestments": "Short-Term Investments",
+      "longTermInvestments": "Long-Term Investments",
       "totalInvestments": "Total Investments",
       "totalSavings": "Total Savings",
       "budgetAllocation": "Budget Allocation",
@@ -92,7 +97,7 @@
       "viewAll": "View All",
       "used": "Used",
       "savings": "Savings",
-      "expensesByCategory": "Expenses by category",
+      "expensesByCategory": "Expenses by Category",
       "incomeVsExpenses": "Income vs Expenses",
       "income": "Income",
       "expenses": "Expenses",
@@ -121,8 +126,8 @@
         "income": "Income",
         "necessary_expense": "Necessary Expense",
         "optional_expense": "Optional Expense",
-        "short_term_investment": "Short-term Investment",
-        "long_term_investment": "Long-term Investment"
+        "short_term_investment": "Short-Term Investment",
+        "long_term_investment": "Long-Term Investment"
       }
     },
     "settings": {
@@ -130,38 +135,17 @@
       "personalInfo": "Personal Information",
       "username": "Username",
       "email": "Email",
-      "preferences": "Preferences",
-      "startDay": "Start Day of Financial Month",
-      "startDayDescription": "This determines which day of the month your financial period begins.",
-      "currency": "Currency",
-      "dateView": "Date View",
-      "notify": "Notify",
-      "notifyDescription": "Receive notifications about new transactions.",
-      "notificationsDisabled": "Notifications Disabled",
-      "notificationsEnabled": "Notifications Enabled",
-      "saveSuccess": "Settings saved successfully",
-      "saveError": "Error saving settings",
-      "dateFormat": "Date Format",
       "language": "Language",
+      "currency": "Currency",
+      "notify": "Notify Me",
+      "notifyDescription": "Receive notifications for new transactions and budget alerts.",
+      "dateFormat": "Date Format",
+      "preferences": "Preferences",
+      "startDay": "Financial Month Start Day",
+      "startDayDescription": "This determines on which day of the month your financial period starts.",
+      "saveChanges": "Save Changes",
       "days": {
         "day": "Day {day}"
-      }
-    },
-    "portfolio": {
-      "title": "Porfolio",
-      "month": {
-        "january": "Jan",
-        "february": "Feb",
-        "march": "Mar",
-        "april": "Apr",
-        "may": "May",
-        "june": "Jun",
-        "july": "Jul",
-        "august": "Aug",
-        "september": "Sept",
-        "october": "Oct",
-        "november": "Nov",
-        "december": "Dec"
       }
     },
     "transactions": {

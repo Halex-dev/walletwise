@@ -25,7 +25,7 @@ Visit WalletWise at: [https://walletwise-halex.netlify.app/](https://walletwise-
 
 ### Prerequisites
 
-- Node.js (v20 or higher)
+- Node.js (v22 or higher)
 - npm or pnpm package manager
 
 ### Installation
@@ -49,7 +49,8 @@ pnpm install
 pnpm dev
 ```
 
-Don't forget about the .env. If u don't know how to manage that, send me a DM on discord: Halex_
+Don't forget about the .env. If u don't know how to manage that, send me a DM on discord: Halex\_
+
 ## 📱 Usage
 
 1. Log in with google

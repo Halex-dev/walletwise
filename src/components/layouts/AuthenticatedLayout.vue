@@ -30,15 +30,36 @@
       </div>
       <nav>
         <ul>
-          <li v-for="item in menuItems" :key="item.to">
-            <router-link
-              :to="item.to"
-              class="flex items-center p-4 hover:bg-primary-600 transition-colors duration-200"
-              :class="{ 'justify-center': isSidebarCollapsed }"
+          <li v-for="section in menuItems" :key="section.key">
+            <!-- Sezione con titolo -->
+            <div
+              v-if="section.title && !isSidebarCollapsed"
+              class="px-4 py-2 text-sm font-semibold text-primary-200"
             >
-              <i :class="['pi', item.icon, 'mr-2']"></i>
-              <span v-if="!isSidebarCollapsed">{{ item.label }}</span>
-            </router-link>
+              {{ section.title }}
+            </div>
+            <!-- Voci di menu -->
+            <ul>
+              <li v-for="item in section.items" :key="item.key">
+                <router-link
+                  v-if="!item.disabled"
+                  :to="item.to"
+                  class="flex items-center p-4 hover:bg-primary-600 transition-colors duration-200"
+                  :class="{ 'justify-center': isSidebarCollapsed }"
+                >
+                  <i :class="['pi', item.icon, 'mr-2']"></i>
+                  <span v-if="!isSidebarCollapsed">{{ item.label }}</span>
+                </router-link>
+                <div
+                  v-else
+                  class="flex items-center p-4 text-gray-400 cursor-not-allowed"
+                  :class="{ 'justify-center': isSidebarCollapsed }"
+                >
+                  <i :class="['pi', item.icon, 'mr-2']"></i>
+                  <span v-if="!isSidebarCollapsed">{{ item.label }}</span>
+                </div>
+              </li>
+            </ul>
           </li>
         </ul>
       </nav>
@@ -98,19 +119,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
 
-/*
-              <Button
-                @click="toggleTheme"
-                :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
-                class="p-button-rounded p-button-text"
-                :class="isDark ? 'text-yellow-400' : 'text-surface-600'"
-                v-tooltip.bottom="
-                  isDark ? $t('common.lightMode') : $t('common.darkMode')
-                "
-              />
-*/
-//const { isDark, toggleTheme } = useTheme()
-
 const { t, locale } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
@@ -141,23 +149,79 @@ defineExpose({ updateLanguage })
 provide('updateLanguage', updateLanguage)
 
 const menuItems = computed(() => [
-  { label: t('nav.dashboard'), icon: 'pi-home', to: '/user/' },
   {
-    label: t('nav.transactions'),
-    icon: 'pi-list',
-    to: '/user/transactions',
+    key: 'dashboard', // Chiave univoca per la sezione
+    title: null, // Nessun titolo per la sezione Dashboard
+    items: [
+      {
+        key: 'dashboard',
+        label: t('nav.dashboard'),
+        icon: 'pi-home',
+        to: '/user/',
+        disabled: false,
+      },
+    ],
   },
   {
-    label: t('nav.categories'),
-    icon: 'pi-chart-line',
-    to: '/user/categories',
+    key: 'financialControl', // Chiave univoca per la sezione
+    title: t('nav.financialControl'), // Titolo per la sezione Financial Control
+    items: [
+      {
+        key: 'budget',
+        label: t('nav.budget'),
+        icon: 'pi-chart-bar',
+        to: '/user/budget',
+        disabled: true,
+      },
+      {
+        key: 'portfolio',
+        label: t('nav.portfolio'),
+        icon: 'pi-wallet',
+        to: '/user/portfolio',
+        disabled: true,
+      },
+      {
+        key: 'subscriptions',
+        label: t('nav.subscriptions'),
+        icon: 'pi-calendar',
+        to: '/user/subscriptions',
+        disabled: true,
+      },
+    ],
   },
   {
-    label: t('nav.portfolio'),
-    icon: 'pi-wallet',
-    to: '/user/portfolio',
+    key: 'movements', // Chiave univoca per la sezione
+    title: t('nav.movements'), // Titolo per la sezione Movements
+    items: [
+      {
+        key: 'transactions',
+        label: t('nav.transactions'),
+        icon: 'pi-list',
+        to: '/user/transactions',
+        disabled: false,
+      },
+    ],
   },
-  { label: t('nav.settings'), icon: 'pi-cog', to: '/user/settings' },
+  {
+    key: 'others', // Chiave univoca per la sezione
+    title: t('nav.others'), // Titolo per la sezione Others
+    items: [
+      {
+        key: 'categories',
+        label: t('nav.categories'),
+        icon: 'pi-chart-line',
+        to: '/user/categories',
+        disabled: false,
+      },
+      {
+        key: 'settings',
+        label: t('nav.settings'),
+        icon: 'pi-cog',
+        to: '/user/settings',
+        disabled: false,
+      },
+    ],
+  },
 ])
 
 const pageTitle = computed(() => {
@@ -190,5 +254,20 @@ const logout = async () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* Stile per i titoli delle sezioni */
+.section-title {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+}
+
+/* Stile per i percorsi disabilitati */
+.disabled-item {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

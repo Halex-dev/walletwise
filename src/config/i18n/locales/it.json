@@ -8,6 +8,7 @@
     "logout": "Esci",
     "cancel": "Annulla",
     "save": "Salva",
+    "saveChanges": "Salva Modifiche",
     "confirm": "Conferma",
     "actions": "Azioni",
     "confirmDelete": "Conferma Eliminazione",
@@ -32,7 +33,13 @@
     "dashboard": "Dashboard",
     "transactions": "Transazioni",
     "categories": "Categorie",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "financialControl": "Financial Control",
+    "movements": "Movimenti",
+    "others": "Altro",
+    "budget": "Budget",
+    "subscriptions": "Spese ricorsive",
+    "portfolio": "Portfolio"
   },
   "pages": {
     "home": {
@@ -128,6 +135,11 @@
       "personalInfo": "Informazioni Personali",
       "username": "Nome Utente",
       "email": "Email",
+      "language": "Lingua",
+      "dateFormat": "Formato Data",
+      "currency": "Valuta",
+      "notify": "Notifiche",
+      "notifyDescription": "Seleziona se desideri ricevere notifiche via email.",
       "preferences": "Preferenze",
       "startDay": "Giorno di Inizio del Mese Finanziario",
       "startDayDescription": "Questo determina in quale giorno del mese inizia il tuo periodo finanziario.",

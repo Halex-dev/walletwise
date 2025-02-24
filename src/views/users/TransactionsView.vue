@@ -451,7 +451,6 @@ async function saveTransaction() {
     closeTransactionModal()
     await fetchTransactions()
   } catch (error) {
-    console.error('Error saving transaction:', error)
     toastManager.showError('pages.transactions.saveError')
   }
 }

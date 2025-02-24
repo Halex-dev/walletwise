@@ -8,6 +8,7 @@ import {
   parseISO,
   isWithinInterval,
   isValid,
+  addDays,
 } from 'date-fns'
 
 export function calculateDateRange(
@@ -29,6 +30,20 @@ export function calculateDateRange(
     startDate = subMonths(startDate, 1)
     endDate = subMonths(endDate, 1)
   }
+
+  return [startDate, endDate]
+}
+
+export function getDateOfYear(delayDays: number = 0): [Date, Date] {
+  const now = new Date()
+  const currentYear = now.getFullYear()
+
+  // Primo giorno del mese scelto con ritardo
+  let startDate = startOfDay(new Date(currentYear, 0, 1)) // startMonth è 1-based
+  startDate = addDays(startDate, delayDays) // Aggiunge il ritardo
+
+  // Ultimo giorno dell'anno
+  let endDate = endOfDay(new Date(currentYear, 11, 31))
 
   return [startDate, endDate]
 }

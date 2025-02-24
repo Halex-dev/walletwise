@@ -22,6 +22,19 @@ export interface Transaction {
   recurrence_frequency?: RecurrenceFrequency
 }
 
+export interface Statistics {
+  totalIncome: number
+  totalExpenses: number
+  totalNecessary: number
+  totalOptional: number
+  totalShortInvestment: number
+  totalLongInvestment: number
+  expensesByCategory: { name: string; amount: number }[]
+  monthLabels: string[]
+  monthlyIncome: number[]
+  monthlyExpenses: number[]
+}
+
 type TransactionUpdateFields = Omit<
   Transaction,
   | 'id'

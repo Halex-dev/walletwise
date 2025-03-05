@@ -458,7 +458,7 @@ const barChartGroupedOptions = {
       },
       ticks: {
         // Mostra i nomi delle categorie sull'asse Y
-        callback: function (value: any, index: number) {
+        callback: function (_value: any, index: number) {
           return expensesByCategoryComparisonData.value.labels[index]
         },
       },

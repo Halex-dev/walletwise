@@ -30,7 +30,6 @@ export interface Statistics {
   totalShortInvestment: number
   totalLongInvestment: number
   expensesByCategory: { name: string; amount: number }[]
-  monthLabels: string[]
   monthlyIncome: number[]
   monthlyExpenses: number[]
 }

@@ -34,10 +34,38 @@ export function calculateDateRange(
   return [startDate, endDate]
 }
 
-export function getDateOfYear(delayDays: number = 0): [Date, Date] {
-  const now = new Date()
-  const currentYear = now.getFullYear()
+export function getDateOfGivenYear(
+  year: number | string, // Accetta sia numeri che stringhe
+  delayDays: number = 0
+): [Date, Date] {
+  const parsedYear = parseInt(year as string, 10)
 
+  if (isNaN(parsedYear) || parsedYear < 1900 || parsedYear > 3000) {
+    throw new Error('Invalid year provided')
+  }
+
+  // Primo giorno dell'anno con ritardo
+  let startDate = startOfDay(new Date(parsedYear, 0, 1))
+  startDate = addDays(startDate, delayDays)
+
+  // Ultimo giorno dell'anno
+  let endDate = endOfDay(new Date(parsedYear, 11, 31))
+
+  return [startDate, endDate]
+}
+
+export function getDateOfYear(
+  delayDays: number = 0,
+  date?: Date
+): [Date, Date] {
+  let currentYear
+
+  if (date) {
+    currentYear = date.getFullYear()
+  } else {
+    const now = new Date()
+    currentYear = now.getFullYear()
+  }
   // Primo giorno del mese scelto con ritardo
   let startDate = startOfDay(new Date(currentYear, 0, 1)) // startMonth è 1-based
   startDate = addDays(startDate, delayDays) // Aggiunge il ritardo

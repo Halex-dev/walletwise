@@ -12,9 +12,7 @@
         @click="prevMonth"
         :disabled="isLoading"
       />
-      <h2 class="text-xl font-semibold">
-        {{ currentMonth }}
-      </h2>
+      <h2 v-if="!isLoading" class="text-xl font-semibold">{{ StringDate }}</h2>
       <Button
         icon="pi pi-chevron-right"
         class="p-button-text"
@@ -108,15 +106,42 @@
       <!-- Expenses by Category Chart -->
       <Card class="shadow-lg">
         <template #title>
-          <h2 class="text-xl font-semibold">
-            {{ $t('pages.dashboard.expensesByCategory') }}
-          </h2>
+          <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold">
+              {{ $t('pages.dashboard.expensesByCategory') }}
+            </h2>
+            <div class="flex gap-2">
+              <Button
+                :label="$t('common.monthly')"
+                :class="{ 'p-button-outlined': !showMonthlyData }"
+                @click="showMonthlyData = true"
+              />
+              <Button
+                :label="$t('common.yearly')"
+                :class="{ 'p-button-outlined': showMonthlyData }"
+                @click="showMonthlyData = false"
+              />
+            </div>
+          </div>
         </template>
         <template #content>
           <Chart
-            v-if="expensesByCategoryData.datasets[0].data.length > 0"
+            v-if="
+              showMonthlyData &&
+              expensesByCategoryData.datasets[0].data.length > 0
+            "
             type="doughnut"
             :data="expensesByCategoryData"
+            :options="doughnutChartOptions"
+            class="h-80"
+          />
+          <Chart
+            v-if="
+              !showMonthlyData &&
+              yearlyExpensesByCategoryData.datasets[0].data.length > 0
+            "
+            type="doughnut"
+            :data="yearlyExpensesByCategoryData"
             :options="doughnutChartOptions"
             class="h-80"
           />
@@ -217,31 +242,71 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { useTransactionStore } from '@/stores/transactionStore'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { formatPercentage, calculatePercentage } from '@/utils/utils'
-import {
-  calculateDateRange,
-  formatDateForAPI,
-  getDateOfYear,
-} from '@/utils/date'
 import {
   getCategoryTagSeverity,
   getAmountColor,
   getBudgetStatusClass,
 } from '@/utils/colors'
+
+import { addMonths, subMonths } from 'date-fns'
 import { formatDateForUser } from '@/utils/users'
 import { formatCurrencyForCurrentUser } from '@/utils/users'
-import { Statistics, Transaction } from '@/types/transaction'
+import { Statistics } from '@/types/transaction'
+import { useStatisticStore } from '@/stores/statisticStore'
 
 const { t } = useI18n()
 const router = useRouter()
-const transactionStore = useTransactionStore()
 const authStore = useAuthStore()
+const statisticStore = useStatisticStore()
 
-const { transactions, StatisticsMonth } = storeToRefs(transactionStore)
+const currentDate = ref(new Date())
+
+const yearSelected = computed(() => {
+  return currentDate.value.getFullYear()
+})
+
+const selectedMonth = computed(() => {
+  return currentDate.value.getMonth()
+})
+
+const { yearlyData, isLoading } = storeToRefs(statisticStore)
 const { appUser } = storeToRefs(authStore)
+
+const StringDate = ref<string>('')
+
+function getMonthLabels() {
+  const monthKeys = [
+    'common.months.january',
+    'common.months.february',
+    'common.months.march',
+    'common.months.april',
+    'common.months.may',
+    'common.months.june',
+    'common.months.july',
+    'common.months.august',
+    'common.months.september',
+    'common.months.october',
+    'common.months.november',
+    'common.months.december',
+  ]
+
+  return monthKeys.map(t) // Applica la traduzione a ciascun mese
+}
+
+const StatisticsMonth = ref<Statistics>({
+  totalIncome: 0,
+  totalExpenses: 0,
+  totalNecessary: 0,
+  totalOptional: 0,
+  totalShortInvestment: 0,
+  totalLongInvestment: 0,
+  expensesByCategory: [],
+  monthlyIncome: [],
+  monthlyExpenses: [],
+})
 
 const StatisticsYear = ref<Statistics>({
   totalIncome: 0,
@@ -251,13 +316,20 @@ const StatisticsYear = ref<Statistics>({
   totalShortInvestment: 0,
   totalLongInvestment: 0,
   expensesByCategory: [],
-  monthLabels: [],
   monthlyIncome: [],
   monthlyExpenses: [],
 })
 
-const isLoading = ref(false)
-const recentTransactions = computed(() => transactions.value.slice(0, 5))
+const showMonthlyData = ref(true)
+
+const recentTransactions = computed(() => {
+  if (yearlyData.value)
+    return yearlyData.value?.months[selectedMonth.value].transactions.slice(
+      0,
+      5
+    )
+  else return []
+})
 
 const financialSummary = computed(() => [
   {
@@ -296,6 +368,7 @@ const financialSummary = computed(() => [
   },
 ])
 
+//TODO tradurre
 const budgetRules = computed(() => [
   {
     name: '50/30/20 Rule',
@@ -343,12 +416,10 @@ const budgetRules = computed(() => [
   },
 ])
 
-const TransactionsYear = ref<Transaction[] | undefined>()
-
 const selectedBudgetRule = ref(budgetRules.value[0])
 
 const incomeVsExpensesData = computed(() => ({
-  labels: StatisticsYear.value.monthLabels,
+  labels: getMonthLabels(),
   datasets: [
     {
       label: t('pages.dashboard.income'),
@@ -365,6 +436,31 @@ const incomeVsExpensesData = computed(() => ({
       backgroundColor: 'rgba(244, 67, 54, 0.2)',
       tension: 0.4,
       fill: true,
+    },
+  ],
+}))
+
+const yearlyExpensesByCategoryData = computed(() => ({
+  labels: StatisticsYear.value.expensesByCategory.map(
+    (category) => category.name
+  ),
+  datasets: [
+    {
+      data: StatisticsYear.value.expensesByCategory.map(
+        (category) => category.amount
+      ),
+      backgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+        '#9966FF',
+        '#FF9F40',
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+        '#4BC0C0',
+      ],
     },
   ],
 }))
@@ -410,91 +506,67 @@ const doughnutChartOptions = {
   plugins: { legend: { position: 'right' } },
 }
 
-const currentDate = ref(new Date())
-const currentMonth = ref(
-  currentDate.value.toLocaleString('default', {
-    month: 'long',
-    year: 'numeric',
-  })
-)
-
-// Fetch transactions of the month selected
-async function fetchTransactions() {
+async function fetchData() {
   if (!appUser.value) return
 
-  isLoading.value = true
   try {
-    const dateRange = calculateDateRange(
-      appUser.value?.start_month || 1,
-      currentDate.value
-    )
-
-    currentMonth.value = currentDate.value.toLocaleString('default', {
-      month: 'long',
-      year: 'numeric',
-    })
-
-    await transactionStore.fetchUserTransactions(
+    await statisticStore.fetchYearStatistics(
       appUser.value.id,
-      formatDateForAPI(dateRange[0]),
-      formatDateForAPI(dateRange[1])
+      yearSelected.value,
+      appUser.value?.start_month || 0
     )
+
+    if (!yearlyData.value) return
+
+    StatisticsYear.value = yearlyData.value.yearlyStatistics
+    await updateChart()
   } catch (error) {
     console.error('Failed to fetch transactions:', error)
   } finally {
     selectedBudgetRule.value = budgetRules.value[0]
-    isLoading.value = false
-  }
-}
-
-// Fetch transactions of the year for statistics
-async function fetchTransactionsYear() {
-  if (!appUser.value) return
-
-  isLoading.value = true
-  try {
-    const dateRange = getDateOfYear(appUser.value?.start_month || 1)
-
-    const { transactions, statistics } =
-      await transactionStore.fetchTransactionsExport(
-        appUser.value.id,
-        formatDateForAPI(dateRange[0]),
-        formatDateForAPI(dateRange[1])
-      )
-
-    TransactionsYear.value = transactions
-    StatisticsYear.value = statistics
-  } catch (error) {
-    console.error('Failed to fetch transactions of the year:', error)
-  } finally {
-    isLoading.value = false
   }
 }
 
 function prevMonth() {
-  currentDate.value.setMonth(currentDate.value.getMonth() - 1)
-  fetchTransactions()
+  currentDate.value = subMonths(currentDate.value, 1)
 }
 
 function nextMonth() {
-  currentDate.value.setMonth(currentDate.value.getMonth() + 1)
-  fetchTransactions()
+  currentDate.value = addMonths(currentDate.value, 1)
 }
 
 function navigateToTransactions() {
   router.push({ name: 'transactions' })
 }
 
+async function updateChart() {
+  if (!yearlyData.value) return
+  StatisticsMonth.value =
+    yearlyData.value.months[selectedMonth.value].statistics
+  StringDate.value = yearlyData.value.months[selectedMonth.value].label
+
+  selectedBudgetRule.value = budgetRules.value[0]
+}
+
 onMounted(async () => {
   if (appUser.value) {
-    await fetchTransactions()
-    await fetchTransactionsYear()
+    await fetchData()
   }
+})
+
+console
+
+watch(selectedMonth, async () => {
+  await updateChart()
+})
+
+watch(yearSelected, async () => {
+  await fetchData()
 })
 
 watch(appUser, async (newUser) => {
   if (newUser) {
-    await fetchTransactions()
+    await fetchData()
   }
 })
 </script>

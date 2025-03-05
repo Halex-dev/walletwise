@@ -49,6 +49,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/users/PortfolioView.vue'),
       },
       {
+        path: 'report',
+        name: 'report',
+        component: () => import('@/views/users/ReportView.vue'),
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('@/views/users//SettingView.vue'),

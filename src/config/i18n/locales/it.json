@@ -22,7 +22,25 @@
     "no": "No",
     "edit": "Modifica",
     "languageChanged": "Lingua cambiata",
-    "logoutSuccess": "Disconnessione avvenuta con successo"
+    "logoutSuccess": "Disconnessione avvenuta con successo",
+    "monthly": "Mensile",
+    "weekly": "Settimanale",
+    "daily": "Giornaliero",
+    "yearly": "Annuale",
+    "months": {
+      "january": "Gennaio",
+      "february": "Febbraio",
+      "march": "Marzo",
+      "april": "Aprile",
+      "may": "Maggio",
+      "june": "Giugno",
+      "july": "Luglio",
+      "august": "Agosto",
+      "september": "Settembre",
+      "october": "Ottobre",
+      "november": "Novembre",
+      "december": "Dicembre"
+    }
   },
   "validation": {
     "required": "Il campo {field} è obbligatorio",
@@ -39,6 +57,7 @@
     "others": "Altro",
     "budget": "Budget",
     "subscriptions": "Spese ricorsive",
+    "report": "Report",
     "portfolio": "Portfolio"
   },
   "pages": {
@@ -171,6 +190,21 @@
       "deleteConfirm": "Sei sicuro di voler eliminare questa transazione?",
       "errorOccurred": "Si è verificato un errore. Per favore riprova.",
       "descriptionPlaceholder": "Inserisci descrizione (opzionale)"
+    },
+    "report": {
+      "title": "Report",
+      "incomeVsExpensesComparison": "Confronto Entrate vs Uscite",
+      "difference": "rispetto all'anno",
+      "expensesByCategoryComparison": "Confronto Spese per Categoria",
+      "topExpenses": "Spese più Alte per categoria",
+      "totalIncome": "Entrate Totali",
+      "totalExpenses": "Uscite Totali",
+      "totalInvestments": "Investimenti Totali",
+      "totalSaved": "Saldo Totale",
+      "dataNotAviable": "Nessun dato disponibile per confrontare.",
+      "expenses": "Spese",
+      "income": "Entrate",
+      "outflows": "Uscite"
     }
   }
 }

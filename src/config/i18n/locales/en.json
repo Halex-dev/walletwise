@@ -14,15 +14,33 @@
     "confirmDelete": "Confirm Deletion",
     "success": "Success",
     "error": "Error",
-    "info": "Information",
+    "info": "Info",
     "warning": "Warning",
     "search": "Search",
     "delete": "Delete",
     "yes": "Yes",
     "no": "No",
     "edit": "Edit",
-    "languageChanged": "Language Changed",
-    "logoutSuccess": "Logout Successful"
+    "languageChanged": "Language changed",
+    "logoutSuccess": "Logout successful",
+    "monthly": "Monthly",
+    "weekly": "Weekly",
+    "daily": "Daily",
+    "yearly": "Yearly",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
   },
   "validation": {
     "required": "The {field} field is required",
@@ -39,13 +57,14 @@
     "others": "Others",
     "budget": "Budget",
     "subscriptions": "Recurring Expenses",
+    "report": "Report",
     "portfolio": "Portfolio"
   },
   "pages": {
     "home": {
       "tagline": "Your smart solution for personal financial management",
       "welcome": "Welcome to WalletWise",
-      "description": "WalletWise is an intuitive personal finance management application designed to help you take control of your financial life. With powerful tools and a user-friendly interface, tracking expenses and planning your budget has never been easier.",
+      "description": "WalletWise is an intuitive personal finance application designed to help you take control of your financial life. With powerful tools and a user-friendly interface, tracking expenses and planning your budget has never been easier.",
       "features": {
         "easyTracking": "Easy tracking of income and expenses",
         "budgeting": "Advanced budgeting tools",
@@ -136,10 +155,10 @@
       "username": "Username",
       "email": "Email",
       "language": "Language",
-      "currency": "Currency",
-      "notify": "Notify Me",
-      "notifyDescription": "Receive notifications for new transactions and budget alerts.",
       "dateFormat": "Date Format",
+      "currency": "Currency",
+      "notify": "Notifications",
+      "notifyDescription": "Select if you want to receive email notifications.",
       "preferences": "Preferences",
       "startDay": "Financial Month Start Day",
       "startDayDescription": "This determines on which day of the month your financial period starts.",
@@ -171,6 +190,21 @@
       "deleteConfirm": "Are you sure you want to delete this transaction?",
       "errorOccurred": "An error occurred. Please try again.",
       "descriptionPlaceholder": "Enter description (optional)"
+    },
+    "report": {
+      "title": "Report",
+      "incomeVsExpensesComparison": "Income vs Expenses Comparison",
+      "difference": "compared to last year",
+      "expensesByCategoryComparison": "Expenses by Category Comparison",
+      "topExpenses": "Top Expenses by Category",
+      "totalIncome": "Total Income",
+      "totalExpenses": "Total Expenses",
+      "totalInvestments": "Total Investments",
+      "totalSaved": "Total Balance",
+      "dataNotAviable": "No data available to compare.",
+      "expenses": "Expenses",
+      "income": "Income",
+      "outflows": "Outflows"
     }
   }
 }

@@ -174,6 +174,13 @@ const menuItems = computed(() => [
         disabled: true,
       },
       {
+        key: 'report',
+        label: t('nav.report'),
+        icon: 'pi-chart-pie',
+        to: '/user/report',
+        disabled: false,
+      },
+      {
         key: 'portfolio',
         label: t('nav.portfolio'),
         icon: 'pi-wallet',

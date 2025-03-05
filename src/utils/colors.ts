@@ -1,6 +1,21 @@
 import { Category } from '@/types/category'
 import { Transaction } from '@/types/transaction'
 
+export const categoryColors = [
+  '#FF6384', // Rosso
+  '#36A2EB', // Blu
+  '#FFCE56', // Giallo
+  '#4BC0C0', // Turchese
+  '#9966FF', // Viola
+  '#FF9F40', // Arancione
+  '#C9CBCF', // Grigio
+  '#77DD77', // Verde chiaro
+  '#FF6961', // Rosso chiaro
+  '#AEC6CF', // Azzurro pastello
+  '#FDFD96', // Giallo pastello
+  '#B39EB5', // Viola pastello
+]
+
 export function getAmountColor(transaction: Transaction): string {
   if (!transaction.category?.type) return ''
   const categoryTypeName = transaction.category.type.name

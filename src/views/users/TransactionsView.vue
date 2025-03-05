@@ -244,20 +244,6 @@
             :offLabel="t('common.no')"
           />
         </div>
-        <div v-if="currentTransaction.is_recurring" class="field md:col-span-2">
-          <label for="recurrenceFrequency" class="font-medium">{{
-            t('pages.transactions.recurrenceFrequency')
-          }}</label>
-          <Select
-            id="recurrenceFrequency"
-            v-model="currentTransaction.recurrence_frequency_id"
-            :options="recurrenceFrequencies"
-            optionLabel="name"
-            optionValue="id"
-            :placeholder="t('pages.transactions.selectFrequency')"
-            class="w-full"
-          />
-        </div>
       </div>
       <template #footer>
         <Button
@@ -319,9 +305,6 @@ const isEditing = ref(false)
 const loading = ref(true)
 
 const categories = computed(() => categoryStore.categories)
-const recurrenceFrequencies = computed(
-  () => transactionStore.recurrenceFrequencies
-)
 
 const DateSelected = ref<Date>(new Date())
 
@@ -386,7 +369,6 @@ async function fetchData() {
       await Promise.all([
         categoryStore.fetchUserCategories(appUser.value.id),
         fetchTransactions(),
-        transactionStore.fetchRecurrenceFrequencies(),
       ])
     }
   } catch (error) {

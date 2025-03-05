@@ -1,17 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import {
-  type Transaction,
-  type RecurrenceFrequency,
-  cleanTransactionUpdates,
-} from '@/types/transaction'
+import { type Transaction, cleanTransactionUpdates } from '@/types/transaction'
 import { transactionService } from '@/services/supabase/transaction'
 
 import { formatDateForAPI } from '@/utils/date'
 
 export const useTransactionStore = defineStore('transaction', () => {
   const transactions = ref<Transaction[]>([])
-  const recurrenceFrequencies = ref<RecurrenceFrequency[]>([])
 
   //TODO fare un store separato
   /*async function fetchRecurrenceFrequencies() {
@@ -96,7 +91,6 @@ export const useTransactionStore = defineStore('transaction', () => {
 
   return {
     transactions,
-    recurrenceFrequencies,
     fetchUserTransactions,
     createTransaction,
     updateTransaction,

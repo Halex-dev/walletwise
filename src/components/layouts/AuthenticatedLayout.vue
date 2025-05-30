@@ -311,28 +311,6 @@ const menuSections = computed(() => [
   },
 ])
 
-// Stats data
-const statsCards = ref([
-  {
-    title: 'dashboard.totalBalance',
-    value: '€2,543.20',
-    change: '+12.5%',
-    positive: true,
-  },
-  {
-    title: 'dashboard.monthlyExpenses',
-    value: '€1,230.45',
-    change: '-8.2%',
-    positive: true,
-  },
-  {
-    title: 'dashboard.savingsGoal',
-    value: '65%',
-    change: '+5.1%',
-    positive: true,
-  },
-])
-
 // Computed properties
 const currentPageTitle = computed(() => {
   const route = router.currentRoute.value

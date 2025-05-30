@@ -1,9 +1,5 @@
 <template>
   <div class="report-view p-4 md:p-6 lg:p-8 bg-surface text-text">
-    <h1 class="text-3xl font-bold mb-8">
-      {{ $t('pages.report.title') }}
-    </h1>
-
     <!-- Year Selection -->
     <div class="flex flex-wrap gap-4 mb-8">
       <Select
@@ -238,7 +234,6 @@ async function fetchDataYear1() {
     if (!yearlyData.value) return
 
     StatisticsYear1.value = yearlyData.value.yearlyStatistics
-    console.log('StatisticsYear1', StatisticsYear1.value)
   } catch (error) {
     console.error('Failed to fetch transactions:', error)
   }
@@ -259,7 +254,6 @@ async function fetchDataYear2() {
     if (!yearlyData.value) return
 
     StatisticsYear2.value = yearlyData.value.yearlyStatistics
-    console.log('StatisticsYear2', StatisticsYear2.value)
   } catch (error) {
     console.error('Failed to fetch transactions:', error)
   }

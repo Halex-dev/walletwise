@@ -1,8 +1,5 @@
 <template>
   <div class="p-4 md:p-6 lg:p-8 transition-all duration-300">
-    <h1 class="text-3xl font-bold mb-6 text-primary">
-      {{ $t('pages.settings.title') }}
-    </h1>
     <form @submit.prevent="saveChanges" class="space-y-6">
       <Card
         class="mb-4 shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -175,8 +172,6 @@
         />
       </div>
     </form>
-
-    <Toast />
   </div>
 </template>
 

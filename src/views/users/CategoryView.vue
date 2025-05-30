@@ -1,9 +1,5 @@
 <template>
   <div class="categories-page p-4 md:p-6 lg:p-8">
-    <h1 class="text-3xl font-semibold mb-6 text-primary">
-      {{ $t('pages.categories.title') }}
-    </h1>
-
     <!-- Filters -->
     <div
       class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"

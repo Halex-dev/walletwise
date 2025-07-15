@@ -176,7 +176,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, inject } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
@@ -194,7 +194,7 @@ import { displayDate } from '@/types/user'
 
 const authStore = useAuthStore()
 const { appUser } = storeToRefs(authStore)
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toastManager = useToastManager()
 
 const username = ref('')
@@ -205,8 +205,6 @@ const language = ref('')
 const notify = ref(false)
 const dateFormat = ref<displayDate>('dd/mm/yyyy')
 const isSaving = ref(false)
-
-type UpdateLanguageFunction = (newLanguage: string) => void
 
 const rules = {
   username: { required },
@@ -229,11 +227,6 @@ const dayOptions = computed(() =>
     value: i + 1,
   }))
 )
-
-// Inject the updateLanguage function from the parent component
-const updateLanguage = inject('updateLanguage') as
-  | UpdateLanguageFunction
-  | undefined
 
 const originalLanguage = ref('')
 
@@ -268,6 +261,7 @@ const saveChanges = async () => {
   const isValid = await v$.value.$validate()
   if (!isValid) return
 
+  console.log('Saving changes...')
   if (appUser.value) {
     try {
       isSaving.value = true
@@ -281,8 +275,8 @@ const saveChanges = async () => {
       })
 
       // Apply language change only if it has changed
-      if (language.value !== originalLanguage.value && updateLanguage) {
-        updateLanguage(language.value)
+      if (language.value !== originalLanguage.value) {
+        locale.value = language.value
         originalLanguage.value = language.value
         appUser.value.language = language.value
       }

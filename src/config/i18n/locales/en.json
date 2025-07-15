@@ -172,6 +172,9 @@
       "saveChanges": "Save Changes",
       "days": {
         "day": "Day {day}"
+      },
+      "notifications": {
+        "saveSuccess": "Your settings have been saved successfully."
       }
     },
     "transactions": {

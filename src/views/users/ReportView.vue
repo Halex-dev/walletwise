@@ -122,7 +122,33 @@
                 <p :class="['text-2xl font-bold mb-1', metric.colorClass]">
                   {{ metric.value }}
                 </p>
-                <div v-if="metric.difference" class="flex items-center gap-1">
+                <div
+                  v-if="metric.difference && metric.opposite"
+                  class="flex items-center gap-1"
+                >
+                  <i
+                    :class="[
+                      'pi text-xs',
+                      metric.difference.startsWith('+')
+                        ? ' pi-arrow-up text-red-500'
+                        : 'pi-arrow-down text-green-500',
+                    ]"
+                  ></i>
+                  <small
+                    :class="[
+                      'text-xs font-medium',
+                      metric.difference.startsWith('+')
+                        ? 'text-red-600 dark:text-red-400'
+                        : 'text-green-600 dark:text-green-400',
+                    ]"
+                  >
+                    {{ metric.difference }}
+                  </small>
+                </div>
+                <div
+                  v-else-if="metric.difference"
+                  class="flex items-center gap-1"
+                >
                   <i
                     :class="[
                       'pi text-xs',
@@ -321,6 +347,7 @@ const financialMetrics = computed(() => {
       colorClass: 'text-red-600',
       iconColorClass: 'text-red-400',
       icon: 'pi pi-shopping-cart',
+      opposite: true,
     },
     {
       label: 'pages.report.totalInvestments',

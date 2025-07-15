@@ -43,11 +43,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'categories',
         component: () => import('@/views/users/CategoryView.vue'),
       },
-      {
+      /*{
         path: 'portfolio',
         name: 'portfolio',
         component: () => import('@/views/users/PortfolioView.vue'),
-      },
+      },*/
       {
         path: 'report',
         name: 'report',

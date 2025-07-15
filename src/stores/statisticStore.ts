@@ -41,7 +41,8 @@ export const useStatisticStore = defineStore('statistic', () => {
   // Funzione per calcolare i dati mensili
   function calculateMonthlyData(
     transactions: Transaction[],
-    types: string | string[]
+    types: string | string[],
+    delayDays: number | 0
   ) {
     const typeArray = Array.isArray(types) ? types : [types]
     const monthlyData: number[] = new Array(12).fill(0) // Inizializza un array di 12 elementi con valore 0
@@ -49,8 +50,17 @@ export const useStatisticStore = defineStore('statistic', () => {
     transactions
       .filter((t) => typeArray.includes(t.category?.type?.name || ''))
       .forEach((t) => {
+        let monthIndex = 0
         const transactionDate = parseISO(t.date.toString())
-        const monthIndex = transactionDate.getMonth() // Ottieni l'indice del mese (0-11)
+        const day = transactionDate.getDate()
+
+        //Adatto per il ritardo
+        if (day < delayDays) {
+          monthIndex = transactionDate.getMonth() - 1
+        } else {
+          monthIndex = transactionDate.getMonth()
+        }
+
         monthlyData[monthIndex] += t.amount // Aggiungi l'importo al mese corrispondente
       })
 
@@ -58,7 +68,10 @@ export const useStatisticStore = defineStore('statistic', () => {
   }
 
   // Funzione per calcolare le statistiche
-  function calculateStatistics(transactions: Transaction[]): Statistics {
+  function calculateStatistics(
+    transactions: Transaction[],
+    delayDays: number
+  ): Statistics {
     const totalIncome = Number(
       transactions
         .filter((t) => t.category?.type?.name === 'income')
@@ -130,11 +143,16 @@ export const useStatisticStore = defineStore('statistic', () => {
         .sort((a, b) => b.amount - a.amount)
     })()
 
-    const monthlyIncome = calculateMonthlyData(transactions, 'income')
-    const monthlyExpenses = calculateMonthlyData(transactions, [
-      'necessary_expense',
-      'optional_expense',
-    ])
+    const monthlyIncome = calculateMonthlyData(
+      transactions,
+      'income',
+      delayDays
+    )
+    const monthlyExpenses = calculateMonthlyData(
+      transactions,
+      ['necessary_expense', 'optional_expense'],
+      delayDays
+    )
 
     return {
       totalIncome,
@@ -182,18 +200,25 @@ export const useStatisticStore = defineStore('statistic', () => {
       // Distribuisce le transazioni nei rispettivi mesi
       allTransactions.forEach((transaction) => {
         const transactionDate = parseISO(transaction.date.toString())
-        const monthIndex = transactionDate.getMonth()
+        const day = transactionDate.getDate()
+        let monthIndex = 0
+
+        //Adatto per il ritardo
+        if (day < delayDays) {
+          monthIndex = transactionDate.getMonth() - 1
+        } else {
+          monthIndex = transactionDate.getMonth()
+        }
 
         // Verifica che la transazione appartenga all'anno specificato
         if (transactionDate.getFullYear() === year) {
           months[monthIndex].transactions.push(transaction)
         }
       })
-
       // Calcola le statistiche per ogni mese
       months.forEach((month) => {
         if (month.transactions.length > 0) {
-          month.statistics = calculateStatistics(month.transactions)
+          month.statistics = calculateStatistics(month.transactions, delayDays)
         } else {
           // Se non ci sono transazioni, mantieni le statistiche vuote
           month.statistics = createEmptyStatistics()
@@ -203,7 +228,7 @@ export const useStatisticStore = defineStore('statistic', () => {
       // Aggiunge anche le statistiche complessive dell'anno
       const yearlyStatistics =
         allTransactions.length > 0
-          ? calculateStatistics(allTransactions)
+          ? calculateStatistics(allTransactions, delayDays)
           : createEmptyStatistics()
 
       return {
@@ -228,8 +253,8 @@ export const useStatisticStore = defineStore('statistic', () => {
       isLoading.value = true
       currentYear.value = year
 
-      // Imposta le date di inizio e fine per l'intero anno
-      const dateYear = await getDateOfGivenYear(year, delayDays)
+      // Imposta le date di inizio e fine per l'intero anno - -1 perche' prende il giorno successivo, partiamo dal 10
+      const dateYear = getDateOfGivenYear(year, delayDays - 1)
 
       // Ottiene tutte le transazioni dell'anno
       const allTransactions = await transactionService.getUserTransactions(
@@ -252,7 +277,15 @@ export const useStatisticStore = defineStore('statistic', () => {
       // Distribuisce le transazioni nei rispettivi mesi
       allTransactions.forEach((transaction) => {
         const transactionDate = parseISO(transaction.date.toString())
-        const monthIndex = transactionDate.getMonth()
+        const day = transactionDate.getDate()
+        let monthIndex = 0
+
+        //Adatto per il ritardo
+        if (day < delayDays) {
+          monthIndex = transactionDate.getMonth() - 1
+        } else {
+          monthIndex = transactionDate.getMonth()
+        }
 
         // Verifica che la transazione appartenga all'anno specificato
         if (transactionDate.getFullYear() === year) {
@@ -263,7 +296,7 @@ export const useStatisticStore = defineStore('statistic', () => {
       // Calcola le statistiche per ogni mese
       months.forEach((month) => {
         if (month.transactions.length > 0) {
-          month.statistics = calculateStatistics(month.transactions)
+          month.statistics = calculateStatistics(month.transactions, delayDays)
         } else {
           // Se non ci sono transazioni, mantieni le statistiche vuote
           month.statistics = createEmptyStatistics()
@@ -273,7 +306,7 @@ export const useStatisticStore = defineStore('statistic', () => {
       // Aggiunge anche le statistiche complessive dell'anno
       const yearlyStatistics =
         allTransactions.length > 0
-          ? calculateStatistics(allTransactions)
+          ? calculateStatistics(allTransactions, delayDays)
           : createEmptyStatistics()
 
       yearlyData.value = {

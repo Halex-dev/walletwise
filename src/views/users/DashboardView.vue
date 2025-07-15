@@ -554,8 +554,6 @@ onMounted(async () => {
   }
 })
 
-console
-
 watch(selectedMonth, async () => {
   await updateChart()
 })

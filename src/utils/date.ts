@@ -9,6 +9,7 @@ import {
   isWithinInterval,
   isValid,
   addDays,
+  subDays,
 } from 'date-fns'
 
 export function calculateDateRange(
@@ -24,6 +25,8 @@ export function calculateDateRange(
 
   let startDate = startOfDay(new Date(currentYear, currentMonth, startMonth))
   let endDate = endOfDay(addMonths(startDate, 1))
+
+  endDate = subDays(endDate, 1)
 
   // Se la data di inizio è nel futuro, torniamo indietro di un mese
   if (isBefore(now, startDate)) {

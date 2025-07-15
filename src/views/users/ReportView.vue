@@ -1,96 +1,240 @@
 <template>
-  <div class="report-view p-4 md:p-6 lg:p-8 bg-surface text-text">
-    <!-- Year Selection -->
-    <div class="flex flex-wrap gap-4 mb-8">
-      <Select
-        v-model="selectedYear1"
-        :options="availableYears"
-        optionLabel="label"
-        placeholder="Seleziona il primo anno"
-        class="w-64"
-      />
-      <Select
-        v-model="selectedYear2"
-        :options="availableYears"
-        optionLabel="label"
-        placeholder="Seleziona il secondo anno"
-        class="w-64"
-      />
+  <div class="report-view p-4 md:p-6 lg:p-8">
+    <!-- Year Selection Controls -->
+    <div class="mb-8">
+      <div
+        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+      >
+        <div
+          class="flex flex-col lg:flex-row gap-4 items-start lg:items-center"
+        >
+          <div class="flex-1">
+            <label
+              class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block"
+            >
+              {{ $t('pages.report.compareYears') }}
+            </label>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <div class="flex-1">
+                <Select
+                  v-model="selectedYear1"
+                  :options="availableYears"
+                  optionLabel="label"
+                  :placeholder="$t('pages.report.selectFirstYear')"
+                  class="w-full transition-all duration-300 focus:shadow-lg"
+                />
+              </div>
+              <div class="flex items-center justify-center px-4 py-2">
+                <i class="pi pi-arrow-right text-gray-400"></i>
+              </div>
+              <div class="flex-1">
+                <Select
+                  v-model="selectedYear2"
+                  :options="availableYears"
+                  optionLabel="label"
+                  :placeholder="$t('pages.report.selectSecondYear')"
+                  class="w-full transition-all duration-300 focus:shadow-lg"
+                />
+              </div>
+            </div>
+          </div>
+          <Button
+            @click="refreshData"
+            :label="$t('common.refresh')"
+            icon="pi pi-refresh"
+            class="p-button-outlined transition-all duration-300 hover:shadow-lg"
+            :loading="isLoading"
+          />
+        </div>
+      </div>
     </div>
 
-    <!-- Loading Indicator -->
-    <div v-if="isLoading" class="flex justify-center items-center mb-8">
-      <ProgressSpinner />
+    <!-- Loading State -->
+    <div v-if="isLoading" class="space-y-8">
+      <!-- Loading Skeleton for Metrics -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
+          v-for="i in 4"
+          :key="`metric-skeleton-${i}`"
+          class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 animate-pulse"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+              <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+              <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+            </div>
+            <div
+              class="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Skeleton for Charts -->
+      <div class="space-y-6">
+        <div
+          v-for="i in 2"
+          :key="`chart-skeleton-${i}`"
+          class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 animate-pulse"
+        >
+          <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+          <div class="h-96 bg-gray-200 dark:bg-gray-700 rounded"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div
+      v-else-if="!StatisticsYear1 && !StatisticsYear2 && !isLoading"
+      class="text-center py-16"
+    >
+      <div
+        class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6"
+      >
+        <i class="pi pi-chart-line text-3xl text-gray-400"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        {{ $t('pages.report.noData') }}
+      </h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        {{ $t('pages.report.selectYearsToCompare') }}
+      </p>
     </div>
 
     <!-- Comparison Results -->
-    <div v-else>
+    <div v-else class="space-y-8">
       <!-- Financial Overview -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div
           v-for="(metric, index) in financialMetrics"
           :key="index"
-          class="shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 group hover:scale-105"
         >
-          <template #content>
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-sm font-semibold text-gray-500 mb-1">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex-1">
+                <h3
+                  class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2"
+                >
                   {{ $t(metric.label) }}
                 </h3>
-                <p :class="['text-2xl font-bold', metric.colorClass]">
+                <p :class="['text-2xl font-bold mb-1', metric.colorClass]">
                   {{ metric.value }}
                 </p>
-                <small v-if="metric.difference" class="text-gray-500">
-                  {{ metric.difference }}
-                </small>
+                <div v-if="metric.difference" class="flex items-center gap-1">
+                  <i
+                    :class="[
+                      'pi text-xs',
+                      metric.difference.startsWith('+')
+                        ? 'pi-arrow-up text-green-500'
+                        : 'pi-arrow-down text-red-500',
+                    ]"
+                  ></i>
+                  <small
+                    :class="[
+                      'text-xs font-medium',
+                      metric.difference.startsWith('+')
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-red-600 dark:text-red-400',
+                    ]"
+                  >
+                    {{ metric.difference }}
+                  </small>
+                </div>
               </div>
-              <i :class="[metric.icon, 'text-4xl', metric.iconColorClass]"></i>
+              <div
+                class="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 group-hover:scale-110 transition-all duration-300"
+              >
+                <i :class="[metric.icon, 'text-xl', metric.iconColorClass]"></i>
+              </div>
             </div>
-          </template>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <!-- Income vs Expenses Comparison Chart -->
-      <Card class="shadow-lg mb-8">
-        <template #title>
-          <h2 class="text-xl font-semibold">
-            {{ $t('pages.report.incomeVsExpensesComparison') }}
-          </h2>
-        </template>
-        <template #content>
-          <Chart
-            v-if="StatisticsYear2"
-            type="bar"
-            :data="incomeVsExpensesComparisonData"
-            :options="barChartOptions"
-            class="h-96"
-          />
-        </template>
-      </Card>
+      <div
+        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+              {{ $t('pages.report.incomeVsExpensesComparison') }}
+            </h2>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('pages.report.income')
+              }}</span>
+              <div class="w-3 h-3 bg-red-500 rounded-full ml-4"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                $t('pages.report.expenses')
+              }}</span>
+            </div>
+          </div>
+          <div class="relative">
+            <Chart
+              v-if="StatisticsYear2"
+              type="bar"
+              :data="incomeVsExpensesComparisonData"
+              :options="barChartOptions"
+              class="h-96"
+            />
+            <div v-else class="h-96 flex items-center justify-center">
+              <div class="text-center">
+                <i class="pi pi-chart-bar text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400">
+                  {{ $t('pages.report.selectBothYearsForComparison') }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Expenses by Category Comparison Chart -->
-      <Card class="shadow-lg mb-8">
-        <template #title>
-          <h2 class="text-xl font-semibold">
-            {{ $t('pages.report.expensesByCategoryComparison') }}
-          </h2>
-        </template>
-        <template #content>
-          <div v-if="expensesByCategoryComparisonData.labels.length === 0">
-            <p class="text-gray-500">
-              {{ $t('pages.report.dataNotAviable') }}
-            </p>
+      <div
+        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+              {{ $t('pages.report.expensesByCategoryComparison') }}
+            </h2>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                selectedYear1.label
+              }}</span>
+              <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span class="text-sm text-gray-600 dark:text-gray-400 ml-4">{{
+                selectedYear2.label
+              }}</span>
+              <div class="w-3 h-3 bg-blue-300 rounded-full"></div>
+            </div>
           </div>
-          <Chart
-            v-else
-            type="bar"
-            :data="expensesByCategoryComparisonData"
-            :options="barChartGroupedOptions"
-            class="h-96"
-          />
-        </template>
-      </Card>
+          <div class="relative">
+            <div
+              v-if="expensesByCategoryComparisonData.labels.length === 0"
+              class="h-96 flex items-center justify-center"
+            >
+              <div class="text-center">
+                <i class="pi pi-chart-pie text-4xl text-gray-400 mb-4"></i>
+                <p class="text-gray-500 dark:text-gray-400">
+                  {{ $t('pages.report.dataNotAviable') }}
+                </p>
+              </div>
+            </div>
+            <Chart
+              v-else
+              type="bar"
+              :data="expensesByCategoryComparisonData"
+              :options="barChartGroupedOptions"
+              class="h-96"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -474,4 +618,49 @@ watch(selectedYear1, async () => {
 watch(selectedYear2, async () => {
   await fetchDataYear2()
 })
+
+async function refreshData() {
+  isLoading.value = true
+  try {
+    await Promise.all([fetchDataYear1(), fetchDataYear2()])
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
+
+<style scoped>
+.report-view {
+  min-height: 100vh;
+}
+
+.metric-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.metric-card:hover {
+  transform: translateY(-4px);
+}
+
+.chart-container {
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 640px) {
+  .metric-card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-card,
+  .chart-container {
+    transition: none !important;
+  }
+
+  .metric-card:hover {
+    transform: none !important;
+  }
+}
+</style>

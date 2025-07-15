@@ -1,74 +1,160 @@
 <template>
   <div class="categories-page p-4 md:p-6 lg:p-8">
-    <!-- Filters -->
-    <div
-      class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-    >
-      <Button
-        @click="openNewCategoryDialog"
-        :label="$t('pages.categories.addNew')"
-        icon="pi pi-plus"
-        class="p-button-primary w-full sm:w-auto transition-colors duration-200 hover:bg-primary-600"
-      />
-      <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-        <IconField>
-          <InputIcon class="pi pi-search" />
-          <InputText
-            v-model="searchQuery"
-            :placeholder="$t('common.search')"
-            class="w-full"
-          />
-        </IconField>
-        <Select
-          v-model="selectedType"
-          :options="categoryTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          :placeholder="$t('pages.categories.filterByType')"
-          class="w-full sm:w-64"
+    <!-- Filters & Actions -->
+    <div class="mb-8">
+      <div
+        class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700"
+      >
+        <div
+          class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4"
         >
-          <template #value="slotProps">
-            <div v-if="slotProps.value" class="flex align-items-center">
-              <span>{{ slotProps.value.label }}</span>
-            </div>
-            <span v-else>
-              {{ $t('pages.categories.filterByType') }}
-            </span>
-          </template>
-        </Select>
+          <!-- Add New Button -->
+          <Button
+            @click="openNewCategoryDialog"
+            :label="$t('pages.categories.addNew')"
+            icon="pi pi-plus"
+            class="p-button-primary w-full lg:w-auto transition-all duration-300 hover:shadow-xl hover:scale-105 rounded-xl"
+          />
+
+          <!-- Search & Filter Controls -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+            <IconField class="w-full sm:w-64">
+              <InputIcon class="pi pi-search" />
+              <InputText
+                v-model="searchQuery"
+                :placeholder="$t('common.search')"
+                class="w-full transition-all duration-300 focus:shadow-lg"
+              />
+            </IconField>
+            <Select
+              v-model="selectedType"
+              :options="categoryTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              :placeholder="$t('pages.categories.filterByType')"
+              class="w-full sm:w-64 transition-all duration-300 focus:shadow-lg"
+            >
+              <template #value="slotProps">
+                <div v-if="slotProps.value" class="flex align-items-center">
+                  <span>{{ slotProps.value.label }}</span>
+                </div>
+                <span v-else>
+                  {{ $t('pages.categories.filterByType') }}
+                </span>
+              </template>
+            </Select>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Transition -->
+    <!-- Loading State -->
+    <div
+      v-if="loading"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+    >
+      <div
+        v-for="i in 8"
+        :key="`skeleton-${i}`"
+        class="category-card bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 animate-pulse"
+      >
+        <div class="h-6 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4"></div>
+        <div
+          class="h-8 bg-gray-200 dark:bg-gray-700 rounded-full w-20 mb-4"
+        ></div>
+        <div class="flex justify-end gap-2">
+          <div class="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+          <div class="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="filteredCategories.length === 0" class="text-center py-16">
+      <div
+        class="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-6"
+      >
+        <i class="pi pi-inbox text-3xl text-gray-400"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        {{
+          categories.length === 0
+            ? $t('pages.categories.noCategories')
+            : $t('pages.categories.noFilteredCategories')
+        }}
+      </h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        {{
+          categories.length === 0
+            ? $t('pages.categories.createFirstCategory')
+            : $t('pages.categories.tryDifferentFilter')
+        }}
+      </p>
+      <Button
+        v-if="categories.length === 0"
+        @click="openNewCategoryDialog"
+        :label="$t('pages.categories.addNew')"
+        icon="pi pi-plus"
+        class="p-button-primary transition-all duration-300 hover:shadow-xl hover:scale-105 rounded-xl"
+      />
+    </div>
+
+    <!-- Categories Grid -->
     <TransitionGroup
-      name="list"
+      v-else
+      name="category"
       tag="div"
-      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+      class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
       <div
         v-for="category in filteredCategories"
         :key="category.id"
-        class="category-card bg-surface-50 dark:bg-surface-700 rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg hover:scale-105"
+        class="category-card bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
       >
-        <h3 class="text-xl font-semibold mb-2">{{ category.name }}</h3>
-        <Tag
-          :value="$t(`pages.categories.categoryTypes.${category.type?.name}`)"
-          :severity="getCategoryTagSeverity(category)"
-          class="mb-4"
-        />
-        <div class="flex justify-end gap-2 mt-4">
-          <Button
-            icon="pi pi-pencil"
-            class="p-button-rounded p-button-text"
-            @click="editCategory(category)"
-            v-tooltip="$t('common.edit')"
-          />
-          <Button
-            icon="pi pi-trash"
-            class="p-button-rounded p-button-text p-button-danger"
-            @click="confirmDeleteCategory(category)"
-            v-tooltip="$t('common.delete')"
-          />
+        <div class="p-6">
+          <!-- Category Header -->
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+              <h3
+                class="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300"
+              >
+                {{ category.name }}
+              </h3>
+              <Tag
+                :value="
+                  $t(`pages.categories.categoryTypes.${category.type?.name}`)
+                "
+                :severity="getCategoryTagSeverity(category)"
+                class="text-sm rounded-full"
+              />
+            </div>
+          </div>
+
+          <!-- Category Stats (placeholder for future enhancement) -->
+          <div
+            class="mb-4 opacity-60 group-hover:opacity-80 transition-opacity duration-300"
+          >
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              {{ $t('pages.categories.createdAt') }}:
+              {{ formatDate(category.created_at) }}
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-2">
+            <Button
+              icon="pi pi-pencil"
+              class="p-button-rounded p-button-text p-button-sm transition-all duration-300 hover:bg-primary-50 dark:hover:bg-primary-900/20 hover:text-primary-600 dark:hover:text-primary-400 hover:scale-110"
+              @click="editCategory(category)"
+              v-tooltip="$t('common.edit')"
+            />
+            <Button
+              icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-sm p-button-danger transition-all duration-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:scale-110"
+              @click="confirmDeleteCategory(category)"
+              v-tooltip="$t('common.delete')"
+            />
+          </div>
         </div>
       </div>
     </TransitionGroup>
@@ -78,7 +164,10 @@
       :header="dialogHeader"
       :modal="true"
       class="p-fluid"
-      :style="{ width: '450px' }"
+      :style="{ width: '90vw', maxWidth: '450px' }"
+      :draggable="false"
+      :resizable="false"
+      :closable="true"
     >
       <div class="field mb-4">
         <label for="name" class="font-medium mb-2 block">{{
@@ -181,6 +270,7 @@ const editingCategory = ref<Partial<Category>>({})
 const submitted = ref(false)
 const searchQuery = ref('')
 const selectedType = ref<CategoryType | null>(null)
+const dialogLoading = ref(false)
 
 const rules = computed(() => ({
   editingCategory: {
@@ -261,6 +351,7 @@ async function saveCategory() {
   const isValid = await v$.value.$validate()
   if (!isValid) return
 
+  dialogLoading.value = true
   try {
     if (dialogMode.value === 'create') {
       await categoryStore.createCategory({
@@ -281,7 +372,14 @@ async function saveCategory() {
     await fetchData()
   } catch (error) {
     toastManager.showError('pages.categories.saveError')
+  } finally {
+    dialogLoading.value = false
   }
+}
+
+function formatDate(dateString: string | undefined) {
+  if (!dateString) return ''
+  return new Date(dateString).toLocaleDateString()
 }
 
 function confirmDeleteCategory(category: Category) {
@@ -308,13 +406,42 @@ async function deleteCategory(category: Category) {
 </script>
 
 <style scoped>
-.list-enter-active,
-.list-leave-active {
+.category-enter-active,
+.category-leave-active {
   transition: all 0.5s ease;
 }
-.list-enter-from,
-.list-leave-to {
+.category-enter-from,
+.category-leave-to {
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(30px) scale(0.9);
+}
+.category-move {
+  transition: transform 0.5s ease;
+}
+
+.category-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+}
+
+@media (max-width: 640px) {
+  .category-card:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category-card,
+  .category-enter-active,
+  .category-leave-active {
+    transition: none !important;
+  }
+
+  .category-card:hover {
+    transform: none !important;
+  }
 }
 </style>
